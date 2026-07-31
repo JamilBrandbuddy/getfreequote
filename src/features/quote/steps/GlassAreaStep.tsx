@@ -27,7 +27,7 @@ const WHERE = [
 export function GlassAreaStep() {
   const { state, patch, next } = useQuoteWizardContext();
   const [error, setError] = useState<string | null>(null);
-  const area = state.glassArea ?? state.answers.glassArea;
+  const isNotSure = state.answers.glassArea === "not_sure";
   const isNotSure = state.answers.glassArea === "not_sure";
 
   const choose = (value: string) => {
