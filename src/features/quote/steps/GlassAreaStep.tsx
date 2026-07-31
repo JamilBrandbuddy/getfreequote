@@ -28,7 +28,6 @@ export function GlassAreaStep() {
   const { state, patch, next } = useQuoteWizardContext();
   const [error, setError] = useState<string | null>(null);
   const isNotSure = state.answers.glassArea === "not_sure";
-  const isNotSure = state.answers.glassArea === "not_sure";
 
   const choose = (value: string) => {
     setError(null);
