@@ -58,7 +58,7 @@ export function TrustPanel({ trust }: { trust: TrustKey }) {
           <div className="mt-4 space-y-5">
             {items.map((item) => (
               <div key={item.title} className="flex gap-3">
-                <item.icon className="mt-0.5 size-5 shrink-0 text-accent" />
+                <item.icon className="mt-0.5 size-5 shrink-0 text-cta" />
                 <div>
                   <p className="font-semibold">{item.title}</p>
                   <p className="mt-1 text-sm leading-relaxed text-primary-foreground/80">{item.body}</p>
@@ -74,7 +74,7 @@ export function TrustPanel({ trust }: { trust: TrustKey }) {
             href={BUSINESS.phoneHref}
             className="mt-2 flex items-center gap-2 text-lg font-bold text-foreground hover:text-primary"
           >
-            <Phone className="size-5 text-accent" />
+            <Phone className="size-5 text-cta" />
             {BUSINESS.phone}
           </a>
           <p className="mt-2 text-sm text-muted-foreground">

@@ -25,7 +25,7 @@ export function ProgressHeader() {
           href={BUSINESS.phoneHref}
           className="inline-flex h-11 items-center gap-2 rounded-full border border-border bg-card px-4 text-sm font-semibold text-foreground shadow-soft transition-colors hover:bg-secondary"
         >
-          <Phone className="size-4 text-accent" />
+          <Phone className="size-4 text-cta" />
           <span className="hidden sm:inline">{BUSINESS.phone}</span>
           <span className="sm:hidden">Call</span>
         </a>
