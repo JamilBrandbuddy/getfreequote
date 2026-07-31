@@ -11,8 +11,6 @@ import {
   stepPosition,
 } from "./reducer";
 import { stepById, visibleSteps as computeVisibleSteps } from "./steps";
-} from "./reducer";
-import { stepById } from "./steps";
 
 export interface QuoteWizardApi {
   state: WizardState;
