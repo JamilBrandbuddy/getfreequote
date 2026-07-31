@@ -9,7 +9,8 @@ import {
   reducer,
   saveState,
   stepPosition,
-  visibleSteps as computeVisibleSteps,
+} from "./reducer";
+import { stepById, visibleSteps as computeVisibleSteps } from "./steps";
 } from "./reducer";
 import { stepById } from "./steps";
 
