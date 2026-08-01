@@ -13,6 +13,7 @@ export interface QuoteWizardApi {
   submitError: string | null;
   saveStatus: "idle" | "saved";
   resumeAvailable: boolean;
+  liveMessage: string;
   setAnswers: (patch: Partial<QuoteAnswers>) => void;
   goNext: () => void;
   goBack: () => void;
