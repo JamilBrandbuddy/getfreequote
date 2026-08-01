@@ -241,6 +241,7 @@ export function useQuoteWizardState(): QuoteWizardApi {
     submitError,
     saveStatus,
     resumeAvailable: pendingResume !== null,
+    liveMessage,
     setAnswers,
     goNext,
     goBack,
@@ -252,7 +253,5 @@ export function useQuoteWizardState(): QuoteWizardApi {
     dismissResume,
     announce: setLiveMessage,
     trackCall,
-    // Exposed for the live region rendered by the wizard shell.
-    ...({ liveMessage } as { liveMessage: string }),
-  } as QuoteWizardApi & { liveMessage: string };
+  };
 }
