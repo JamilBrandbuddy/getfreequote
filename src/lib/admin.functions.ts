@@ -1,6 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Database } from "@/integrations/supabase/types";
+
+type QuoteStatus = Database["public"]["Enums"]["quote_status"];
+type QuotePriority = Database["public"]["Enums"]["quote_priority"];
+type QuoteUpdate = Database["public"]["Tables"]["quotes"]["Update"];
 
 export interface AdminQuoteListItem {
   id: string;
@@ -62,8 +67,8 @@ export const listQuotes = createServerFn({ method: "POST" })
     const page = Math.max(0, data.page ?? 0);
     let query = context.supabase.from("quotes").select(LIST_COLUMNS, { count: "exact" });
 
-    if (data.status && data.status !== "all") query = query.eq("status", data.status);
-    if (data.priority && data.priority !== "all") query = query.eq("priority", data.priority);
+    if (data.status && data.status !== "all") query = query.eq("status", data.status as QuoteStatus);
+    if (data.priority && data.priority !== "all") query = query.eq("priority", data.priority as QuotePriority);
     if (data.insurance && data.insurance !== "all") query = query.eq("insurance_method", data.insurance);
 
     const search = data.search?.trim();
@@ -103,7 +108,7 @@ export const getQuoteStats = createServerFn({ method: "GET" })
       newCount: rows.filter((r) => r.status === "new").length,
       urgent: rows.filter((r) => r.priority === "urgent").length,
       lastSevenDays: rows.filter((r) => new Date(r.created_at).getTime() >= since).length,
-      won: rows.filter((r) => r.status === "won").length,
+      completed: rows.filter((r) => r.status === "completed").length,
     };
   });
 
@@ -154,10 +159,10 @@ export const updateQuote = createServerFn({ method: "POST" })
     return input;
   })
   .handler(async ({ data, context }) => {
-    const patch: Record<string, unknown> = {};
-    if (data.status) patch["status"] = data.status;
-    if (data.priority) patch["priority"] = data.priority;
-    if (data.internalNotes !== undefined) patch["internal_notes"] = data.internalNotes.slice(0, 5000);
+    const patch: QuoteUpdate = {};
+    if (data.status) patch.status = data.status as QuoteStatus;
+    if (data.priority) patch.priority = data.priority as QuotePriority;
+    if (data.internalNotes !== undefined) patch.internal_notes = data.internalNotes.slice(0, 5000);
     if (Object.keys(patch).length === 0) return { ok: true };
 
     const { error } = await context.supabase.from("quotes").update(patch).eq("id", data.id);
