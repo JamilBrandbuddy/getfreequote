@@ -49,7 +49,6 @@ export const analytics = {
       reference,
       path: pathOf(a),
       payment: a.paymentPath,
-      city: a.city,
       location_type: a.locationType,
     }),
   generateLead: (reference: string) =>
