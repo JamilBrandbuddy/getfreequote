@@ -4,6 +4,7 @@ import { ProgressHeader } from "./components/ProgressHeader";
 import { StepForm } from "./components/StepForm";
 import { TrustPanel } from "./components/TrustPanel";
 import { BUSINESS } from "./data/catalog";
+import { HoneypotField } from "./spamGuard";
 import { QuoteWizardProvider, useQuoteWizard, useQuoteWizardContext } from "./machine/useQuoteWizard";
 import { ConfirmationStep } from "./steps/ConfirmationStep";
 import { GlassAreaStep } from "./steps/GlassAreaStep";
@@ -80,6 +81,7 @@ export function AutoGlassQuoteWizard() {
   const api = useQuoteWizard();
   return (
     <QuoteWizardProvider value={api}>
+      <HoneypotField />
       <WizardInner />
     </QuoteWizardProvider>
   );

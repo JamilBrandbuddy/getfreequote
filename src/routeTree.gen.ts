@@ -11,6 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GetQuoteRouteImport } from './routes/get-quote'
+import { Route as AdminLoginRouteImport } from './routes/admin/login'
+import { Route as AdminQuotesIndexRouteImport } from './routes/admin/quotes/index'
+import { Route as AdminQuotesIdRouteImport } from './routes/admin/quotes/$id'
+import { Route as ApiPublicQuoteSubmissionsRouteImport } from './routes/api/public/quote-submissions'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +26,87 @@ const GetQuoteRoute = GetQuoteRouteImport.update({
   path: '/get-quote',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminQuotesIndexRoute = AdminQuotesIndexRouteImport.update({
+  id: '/admin/quotes/',
+  path: '/admin/quotes/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminQuotesIdRoute = AdminQuotesIdRouteImport.update({
+  id: '/admin/quotes/$id',
+  path: '/admin/quotes/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicQuoteSubmissionsRoute =
+  ApiPublicQuoteSubmissionsRouteImport.update({
+    id: '/api/public/quote-submissions',
+    path: '/api/public/quote-submissions',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/get-quote': typeof GetQuoteRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/quotes/$id': typeof AdminQuotesIdRoute
+  '/api/public/quote-submissions': typeof ApiPublicQuoteSubmissionsRoute
+  '/admin/quotes/': typeof AdminQuotesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/get-quote': typeof GetQuoteRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/quotes/$id': typeof AdminQuotesIdRoute
+  '/api/public/quote-submissions': typeof ApiPublicQuoteSubmissionsRoute
+  '/admin/quotes': typeof AdminQuotesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/get-quote': typeof GetQuoteRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/quotes/$id': typeof AdminQuotesIdRoute
+  '/api/public/quote-submissions': typeof ApiPublicQuoteSubmissionsRoute
+  '/admin/quotes/': typeof AdminQuotesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/get-quote'
+  fullPaths:
+    | '/'
+    | '/get-quote'
+    | '/admin/login'
+    | '/admin/quotes/$id'
+    | '/api/public/quote-submissions'
+    | '/admin/quotes/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/get-quote'
-  id: '__root__' | '/' | '/get-quote'
+  to:
+    | '/'
+    | '/get-quote'
+    | '/admin/login'
+    | '/admin/quotes/$id'
+    | '/api/public/quote-submissions'
+    | '/admin/quotes'
+  id:
+    | '__root__'
+    | '/'
+    | '/get-quote'
+    | '/admin/login'
+    | '/admin/quotes/$id'
+    | '/api/public/quote-submissions'
+    | '/admin/quotes/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   GetQuoteRoute: typeof GetQuoteRoute
+  AdminLoginRoute: typeof AdminLoginRoute
+  AdminQuotesIdRoute: typeof AdminQuotesIdRoute
+  ApiPublicQuoteSubmissionsRoute: typeof ApiPublicQuoteSubmissionsRoute
+  AdminQuotesIndexRoute: typeof AdminQuotesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +125,44 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GetQuoteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/quotes/': {
+      id: '/admin/quotes/'
+      path: '/admin/quotes'
+      fullPath: '/admin/quotes/'
+      preLoaderRoute: typeof AdminQuotesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/quotes/$id': {
+      id: '/admin/quotes/$id'
+      path: '/admin/quotes/$id'
+      fullPath: '/admin/quotes/$id'
+      preLoaderRoute: typeof AdminQuotesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/quote-submissions': {
+      id: '/api/public/quote-submissions'
+      path: '/api/public/quote-submissions'
+      fullPath: '/api/public/quote-submissions'
+      preLoaderRoute: typeof ApiPublicQuoteSubmissionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   GetQuoteRoute: GetQuoteRoute,
+  AdminLoginRoute: AdminLoginRoute,
+  AdminQuotesIdRoute: AdminQuotesIdRoute,
+  ApiPublicQuoteSubmissionsRoute: ApiPublicQuoteSubmissionsRoute,
+  AdminQuotesIndexRoute: AdminQuotesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

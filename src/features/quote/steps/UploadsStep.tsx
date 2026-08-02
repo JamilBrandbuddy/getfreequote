@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Callout } from "../components/Callout";
 import { StepFooter } from "../components/StepFooter";
 import { analytics } from "../analytics";
+import { fileStore } from "../spamGuard";
 import { useQuoteWizardContext } from "../machine/useQuoteWizard";
 import type { UploadedFile } from "../types";
 
@@ -35,8 +36,10 @@ export function UploadsStep() {
         problems.push(`${file.name}: files must be under 10 MB.`);
         continue;
       }
+      const id = `${file.name}-${file.size}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      fileStore.add(id, file);
       accepted.push({
-        id: `${file.name}-${file.size}-${Date.now()}`,
+        id,
         name: file.name,
         size: file.size,
         type: file.type,
@@ -52,7 +55,10 @@ export function UploadsStep() {
     if (inputRef.current) inputRef.current.value = "";
   };
 
-  const remove = (id: string) => patch({ photos: photos.filter((p) => p.id !== id) });
+  const remove = (id: string) => {
+    fileStore.remove(id);
+    patch({ photos: photos.filter((p) => p.id !== id) });
+  };
 
   return (
     <div>
