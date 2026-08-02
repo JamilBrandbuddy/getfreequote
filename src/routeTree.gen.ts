@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GetQuoteRouteImport } from './routes/get-quote'
+import { Route as ApiPublicQuoteSubmissionsRouteImport } from './routes/api/public/quote-submissions'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +23,41 @@ const GetQuoteRoute = GetQuoteRouteImport.update({
   path: '/get-quote',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicQuoteSubmissionsRoute =
+  ApiPublicQuoteSubmissionsRouteImport.update({
+    id: '/api/public/quote-submissions',
+    path: '/api/public/quote-submissions',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/get-quote': typeof GetQuoteRoute
+  '/api/public/quote-submissions': typeof ApiPublicQuoteSubmissionsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/get-quote': typeof GetQuoteRoute
+  '/api/public/quote-submissions': typeof ApiPublicQuoteSubmissionsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/get-quote': typeof GetQuoteRoute
+  '/api/public/quote-submissions': typeof ApiPublicQuoteSubmissionsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/get-quote'
+  fullPaths: '/' | '/get-quote' | '/api/public/quote-submissions'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/get-quote'
-  id: '__root__' | '/' | '/get-quote'
+  to: '/' | '/get-quote' | '/api/public/quote-submissions'
+  id: '__root__' | '/' | '/get-quote' | '/api/public/quote-submissions'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   GetQuoteRoute: typeof GetQuoteRoute
+  ApiPublicQuoteSubmissionsRoute: typeof ApiPublicQuoteSubmissionsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +76,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GetQuoteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/quote-submissions': {
+      id: '/api/public/quote-submissions'
+      path: '/api/public/quote-submissions'
+      fullPath: '/api/public/quote-submissions'
+      preLoaderRoute: typeof ApiPublicQuoteSubmissionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   GetQuoteRoute: GetQuoteRoute,
+  ApiPublicQuoteSubmissionsRoute: ApiPublicQuoteSubmissionsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

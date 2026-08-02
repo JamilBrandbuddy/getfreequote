@@ -5,6 +5,7 @@
 import { buildStepSchema } from "@/features/quote/machine/questions";
 import { STEPS, needsAdas } from "@/features/quote/machine/steps";
 import type { QuoteAnswers } from "@/features/quote/types";
+import type { Json } from "@/integrations/supabase/types";
 
 /* -------------------------------------------------------------- sanitising */
 
@@ -17,8 +18,8 @@ export function clean(value: unknown, max = 500): string | null {
   return trimmed.slice(0, max);
 }
 
-function cleanRecord(answers: QuoteAnswers, keys: (keyof QuoteAnswers)[]) {
-  const out: Record<string, unknown> = {};
+function cleanRecord(answers: QuoteAnswers, keys: (keyof QuoteAnswers)[]): Json {
+  const out: Record<string, Json> = {};
   for (const key of keys) {
     const value = answers[key];
     if (value === undefined || value === null || value === "") continue;

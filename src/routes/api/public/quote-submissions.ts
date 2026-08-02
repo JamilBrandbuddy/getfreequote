@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import type { NotificationQuote } from "@/lib/quote-notify.server";
+
 import {
   ACCEPTED_UPLOAD_TYPES,
   MAX_UPLOAD_BYTES,
@@ -170,7 +172,7 @@ export const Route = createFileRoute("/api/public/quote-submissions")({
         // Notifications never block the saved quote.
         const origin = new URL(request.url).origin;
         const adminUrl = `${origin}/admin/quotes/${quoteId}`;
-        const notification = quote as unknown as notify.NotificationQuote;
+        const notification = quote as unknown as NotificationQuote;
         let customerEmailSent = false;
         try {
           const [, customer] = await Promise.all([
