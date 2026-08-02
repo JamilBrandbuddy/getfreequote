@@ -114,20 +114,58 @@ export function useQuoteWizard(): QuoteWizardApi {
     dispatch({ type: "start" });
   }, []);
 
+  const submitting_ = useRef(false);
+
   const submit = useCallback(async () => {
+    if (submitting_.current) return; // duplicate-submission guard
+    submitting_.current = true;
     setSubmitting(true);
     setSubmitError(null);
     try {
-      // Phase 1: mock submission. Phase 2 replaces this with a server function.
-      await new Promise((resolve) => setTimeout(resolve, 900));
-      const reference = makeReference();
-      analytics.submit(state.answers, reference);
-      analytics.generateLead(reference);
+      const { photos, ...answers } = state.answers;
+      const guard = spamGuardValues();
+      const form = new FormData();
+      form.set(
+        "payload",
+        JSON.stringify({
+          answers,
+          meta: {
+            company: guard.company,
+            elapsedMs: guard.elapsedMs,
+            landingPage: window.location.href,
+            referrer: document.referrer || undefined,
+            utm: readUtmFromLocation(window.location.search),
+          },
+        }),
+      );
+      for (const file of fileStore.get((photos ?? []).map((p) => p.id))) {
+        form.append("files", file, file.name);
+      }
+
+      const response = await fetch("/api/public/quote-submissions", { method: "POST", body: form });
+      const result = (await response.json().catch(() => null)) as
+        | { ok: true; reference: string }
+        | { ok: false; error?: string }
+        | null;
+
+      if (!response.ok || !result || !result.ok) {
+        setSubmitError(
+          (result && "error" in result && result.error) ||
+            "We couldn't send your request. Please try again, or call us and we'll take it over the phone.",
+        );
+        return;
+      }
+
+      // Conversion events fire only once the backend confirms the quote is stored.
+      analytics.submit(state.answers, result.reference);
+      analytics.generateLead(result.reference);
       clearState();
-      dispatch({ type: "submitted", reference });
+      fileStore.clear();
+      dispatch({ type: "submitted", reference: result.reference });
     } catch {
       setSubmitError("We couldn't send your request. Please try again, or call us and we'll take it over the phone.");
     } finally {
+      submitting_.current = false;
       setSubmitting(false);
     }
   }, [state.answers]);
