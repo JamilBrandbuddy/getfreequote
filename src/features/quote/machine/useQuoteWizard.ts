@@ -1,5 +1,7 @@
 import { useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState, createContext } from "react";
 import { analytics } from "../analytics";
+import { fileStore, spamGuardValues } from "../spamGuard";
+import { readUtmFromLocation } from "@/lib/quote-payload";
 import type { AnswerKey, QuoteAnswers, StepId, WizardState } from "../types";
 import {
   clearState,
@@ -42,12 +44,6 @@ export function useQuoteWizardContext() {
 }
 
 export const QuoteWizardProvider = QuoteWizardContext.Provider;
-
-function makeReference() {
-  const n = Math.floor(Math.random() * 9000 + 1000);
-  const d = new Date();
-  return `RBA-${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}-${n}`;
-}
 
 export function useQuoteWizard(): QuoteWizardApi {
   const [state, dispatch] = useReducer(reducer, initialState);
