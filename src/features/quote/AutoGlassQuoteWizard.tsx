@@ -80,6 +80,7 @@ export function AutoGlassQuoteWizard() {
   const api = useQuoteWizard();
   return (
     <QuoteWizardProvider value={api}>
+      <HoneypotField />
       <WizardInner />
     </QuoteWizardProvider>
   );
