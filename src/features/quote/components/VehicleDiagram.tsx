@@ -62,11 +62,7 @@ export function VehicleDiagram({
              L48 176
              Z"
           className="fill-card stroke-border"
-          strokeLinejoin="round"
-          strokeLinecap="round"
-          style={{
-            strokeWidth: "var(--body-stroke, 3)",
-          } as React.CSSProperties}
+          strokeWidth={3}
         />
 
         {/* Wheel arches / cutouts (negative space) */}
