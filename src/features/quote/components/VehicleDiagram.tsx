@@ -1,25 +1,7 @@
 import { cn } from "@/lib/utils";
 
-interface Region {
-  value: string;
-  label: string;
-}
-
-const REGIONS: Region[] = [
-  { value: "windshield", label: "Front windshield" },
-  { value: "sunroof", label: "Sunroof" },
-  { value: "front_door", label: "Front door glass" },
-  { value: "rear_door", label: "Rear door glass" },
-  { value: "quarter", label: "Quarter glass" },
-  { value: "rear_windshield", label: "Rear windshield" },
-  { value: "vent", label: "Vent glass" },
-  { value: "mirror", label: "Side mirror" },
-];
-
 const BASE_GLASS =
   "cursor-pointer outline-none transition-all duration-150 stroke-[1.5]";
-
-const BODY_STROKE = "stroke-[3]";
 
 export function VehicleDiagram({
   value,
@@ -34,51 +16,53 @@ export function VehicleDiagram({
         Tap the glass on the diagram, or choose from the list below.
       </p>
       <svg
-        viewBox="0 0 640 220"
+        viewBox="0 0 640 200"
         className="h-auto w-full"
         role="group"
         aria-label="Vehicle glass diagram"
       >
-        {/* Car body silhouette (background shape) */}
+        {/* Car body silhouette — filled so it reads as a solid shape */}
         <path
-          d="M48 168
-             C48 148, 62 142, 86 140
-             L120 138
-             C132 138, 144 130, 156 118
-             L198 68
-             C210 54, 226 48, 248 48
-             L410 48
-             C438 48, 458 56, 474 74
-             L522 128
-             C536 142, 560 144, 578 148
-             C592 150, 594 156, 594 166
-             L594 176
-             L576 176
-             C576 176, 574 196, 548 196
-             C522 196, 520 176, 520 176
-             L172 176
-             C172 176, 170 196, 144 196
-             C118 196, 116 176, 116 176
-             L48 176
+          d="M52 160
+             C52 142, 66 136, 90 134
+             L122 132
+             C136 132, 150 124, 162 112
+             L204 64
+             C218 50, 236 44, 258 44
+             L412 44
+             C438 44, 458 52, 474 70
+             L520 120
+             C534 134, 556 136, 574 140
+             C588 142, 590 148, 590 158
+             L590 168
+             L576 168
+             C576 168, 574 188, 548 188
+             C522 188, 520 168, 520 168
+             L172 168
+             C172 168, 170 188, 144 188
+             C118 188, 116 168, 116 168
+             L52 168
              Z"
           className="fill-card stroke-border"
           strokeWidth={3}
+          strokeLinejoin="round"
+          strokeLinecap="round"
         />
 
-        {/* Wheel arches / cutouts (negative space) */}
+        {/* Wheel arches (negative space) */}
         <path
-          d="M116 176
-             C116 150, 134 146, 144 146
-             C154 146, 172 150, 172 176
+          d="M116 168
+             C116 144, 132 140, 144 140
+             C156 140, 172 144, 172 168
              Z"
           className="fill-background stroke-background"
           strokeWidth={4}
           strokeLinejoin="round"
         />
         <path
-          d="M520 176
-             C520 150, 538 146, 548 146
-             C558 146, 576 150, 576 176
+          d="M520 168
+             C520 144, 536 140, 548 140
+             C560 140, 576 144, 576 168
              Z"
           className="fill-background stroke-background"
           strokeWidth={4}
@@ -88,23 +72,23 @@ export function VehicleDiagram({
         {/* Wheels */}
         <circle
           cx="144"
-          cy="178"
+          cy="170"
           r="22"
           className="fill-muted stroke-border"
           strokeWidth={3}
         />
         <circle
           cx="548"
-          cy="178"
+          cy="170"
           r="22"
           className="fill-muted stroke-border"
           strokeWidth={3}
         />
 
-        {/* Belt line / body crease */}
+        {/* Belt line */}
         <path
-          d="M86 140 L564 148"
-          className="stroke-border"
+          d="M88 132 L566 140"
+          className="stroke-border/80"
           strokeWidth={2}
           strokeLinecap="round"
           fill="none"
@@ -112,14 +96,14 @@ export function VehicleDiagram({
 
         {/* Door seams */}
         <path
-          d="M302 58 L302 150"
+          d="M304 52 L304 144"
           className="stroke-border/70"
           strokeWidth={2}
           strokeLinecap="round"
           fill="none"
         />
         <path
-          d="M392 58 L392 150"
+          d="M394 52 L394 144"
           className="stroke-border/70"
           strokeWidth={2}
           strokeLinecap="round"
@@ -132,26 +116,26 @@ export function VehicleDiagram({
           label="Front windshield"
           selected={value === "windshield"}
           onSelect={onSelect}
-          d="M244 52
-             L290 52
-             C300 52, 310 56, 316 64
-             L350 110
-             C352 114, 350 118, 346 118
-             L244 118
+          d="M246 48
+             L288 48
+             C298 48, 306 52, 312 60
+             L342 106
+             C344 110, 342 112, 338 112
+             L246 112
              Z"
         />
 
-        {/* Vent glass (small triangle in front of front door) */}
+        {/* Vent glass */}
         <SelectableGlass
           value="vent"
           label="Vent glass"
           selected={value === "vent"}
           onSelect={onSelect}
-          d="M244 122
-             L300 122
-             C302 122, 304 120, 304 118
-             L300 108
-             L244 108
+          d="M246 116
+             L300 116
+             C302 116, 304 114, 304 112
+             L300 104
+             L246 104
              Z"
         />
 
@@ -161,14 +145,14 @@ export function VehicleDiagram({
           label="Front door glass"
           selected={value === "front_door"}
           onSelect={onSelect}
-          d="M308 122
-             L308 58
-             L344 58
-             L392 58
-             L392 108
-             C392 112, 390 114, 386 114
-             L316 114
-             C312 114, 308 120, 308 122
+          d="M308 104
+             L308 52
+             L346 52
+             L394 52
+             L394 100
+             C394 104, 392 106, 388 106
+             L316 106
+             C312 106, 308 112, 308 104
              Z"
         />
 
@@ -178,26 +162,26 @@ export function VehicleDiagram({
           label="Rear door glass"
           selected={value === "rear_door"}
           onSelect={onSelect}
-          d="M400 58
-             L440 58
-             L484 64
-             C488 65, 490 68, 490 72
-             L490 114
-             C490 118, 488 120, 484 120
-             L400 120
+          d="M402 52
+             L440 52
+             L482 58
+             C486 59, 488 62, 488 66
+             L488 108
+             C488 112, 486 114, 482 114
+             L402 114
              Z"
         />
 
-        {/* Quarter glass (small triangle behind rear door) */}
+        {/* Quarter glass */}
         <SelectableGlass
           value="quarter"
           label="Quarter glass"
           selected={value === "quarter"}
           onSelect={onSelect}
-          d="M498 70
-             L524 98
-             C526 100, 526 104, 522 104
-             L498 104
+          d="M496 66
+             L520 92
+             C522 94, 522 98, 518 98
+             L496 98
              Z"
         />
 
@@ -207,11 +191,11 @@ export function VehicleDiagram({
           label="Rear windshield"
           selected={value === "rear_windshield"}
           onSelect={onSelect}
-          d="M468 58
-             L490 58
-             L510 84
-             L510 96
-             L488 96
+          d="M468 52
+             L490 52
+             L510 78
+             L510 90
+             L488 90
              Z"
         />
 
@@ -221,11 +205,11 @@ export function VehicleDiagram({
           label="Sunroof"
           selected={value === "sunroof"}
           onSelect={onSelect}
-          d="M330 44
-             L380 44
-             C384 44, 386 46, 386 50
-             L386 54
-             L330 54
+          d="M332 40
+             L382 40
+             C386 40, 388 42, 388 46
+             L388 50
+             L332 50
              Z"
         />
 
@@ -235,32 +219,14 @@ export function VehicleDiagram({
           label="Side mirror"
           selected={value === "mirror"}
           onSelect={onSelect}
-          d="M338 120
-             L366 120
-             C372 120, 374 124, 374 128
-             L374 134
-             C374 138, 372 140, 366 140
-             L338 140
+          d="M338 116
+             L366 116
+             C372 116, 374 120, 374 124
+             L374 130
+             C374 134, 372 136, 366 136
+             L338 136
              Z"
         />
-
-        {/* Region labels below the car */}
-        <g className="text-[10px] font-medium fill-muted-foreground">
-          {REGIONS.map((r, i) => (
-            <text
-              key={r.value}
-              x={60 + i * 72}
-              y="206"
-              textAnchor="middle"
-              className={cn(
-                "text-[11px]",
-                value === r.value ? "fill-foreground font-semibold" : "fill-muted-foreground"
-              )}
-            >
-              {r.label}
-            </text>
-          ))}
-        </g>
       </svg>
     </div>
   );
