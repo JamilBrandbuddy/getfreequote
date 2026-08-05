@@ -43,8 +43,8 @@ export function VehicleDiagram({
              C118 188, 116 168, 116 168
              L52 168
              Z"
-          className="fill-card stroke-border"
-          strokeWidth={3}
+          className="fill-card stroke-primary/20"
+          strokeWidth={4}
           strokeLinejoin="round"
           strokeLinecap="round"
         />
