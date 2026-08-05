@@ -1,4 +1,5 @@
 import { Phone } from "lucide-react";
+import logoAsset from "@/assets/riverbend-logo.png.asset.json";
 import { Progress } from "@/components/ui/progress";
 import { BUSINESS } from "../data/catalog";
 import { useQuoteWizardContext } from "../machine/useQuoteWizard";
@@ -11,12 +12,16 @@ export function ProgressHeader() {
     <header className="sticky top-0 z-30 border-b border-border/80 bg-background/90 backdrop-blur">
       <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-4 py-3 sm:px-6">
         <div className="flex min-w-0 items-center gap-3">
-          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary text-sm font-black text-primary-foreground">
-            RB
-          </span>
-          <span className="min-w-0">
+          <img
+            src={logoAsset.url}
+            alt={`${BUSINESS.name} logo`}
+            className="h-10 w-auto shrink-0 sm:h-12"
+            width={1920}
+            height={620}
+          />
+          <span className="min-w-0 hidden sm:block">
             <span className="block truncate text-sm font-bold text-foreground sm:text-base">
-              {BUSINESS.shortName}
+              {BUSINESS.name}
             </span>
             <span className="block text-xs text-muted-foreground">SGI-accredited glass shop</span>
           </span>
