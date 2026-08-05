@@ -1,4 +1,5 @@
 import { Phone } from "lucide-react";
+import logoAsset from "@/assets/riverbend-logo.png.asset.json";
 import { Progress } from "@/components/ui/progress";
 import { BUSINESS } from "../data/catalog";
 import { useQuoteWizardContext } from "../machine/useQuoteWizard";
