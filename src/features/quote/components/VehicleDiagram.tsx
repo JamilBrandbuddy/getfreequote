@@ -21,7 +21,7 @@ export function VehicleDiagram({
         role="group"
         aria-label="Vehicle glass diagram"
       >
-        {/* Car body silhouette — filled so it reads as a solid shape */}
+        {/* Car body silhouette */}
         <path
           d="M52 160
              C52 142, 66 136, 90 134
@@ -84,8 +84,23 @@ export function VehicleDiagram({
           className="fill-muted stroke-border"
           strokeWidth={3}
         />
+        {/* Wheel hubs */}
+        <circle
+          cx="144"
+          cy="170"
+          r="7"
+          className="fill-card stroke-border"
+          strokeWidth={2}
+        />
+        <circle
+          cx="548"
+          cy="170"
+          r="7"
+          className="fill-card stroke-border"
+          strokeWidth={2}
+        />
 
-        {/* Belt line */}
+        {/* Belt line / body crease */}
         <path
           d="M88 132 L566 140"
           className="stroke-border/80"
@@ -108,6 +123,24 @@ export function VehicleDiagram({
           strokeWidth={2}
           strokeLinecap="round"
           fill="none"
+        />
+
+        {/* Door handles */}
+        <rect
+          x="326"
+          y="124"
+          width="18"
+          height="6"
+          rx="3"
+          className="fill-border/60"
+        />
+        <rect
+          x="416"
+          y="124"
+          width="18"
+          height="6"
+          rx="3"
+          className="fill-border/60"
         />
 
         {/* Windshield */}
@@ -213,19 +246,26 @@ export function VehicleDiagram({
              Z"
         />
 
-        {/* Side mirror */}
+        {/* Side mirror — mounted near the A-pillar by the windshield */}
         <SelectableGlass
           value="mirror"
           label="Side mirror"
           selected={value === "mirror"}
           onSelect={onSelect}
-          d="M338 116
-             L366 116
-             C372 116, 374 120, 374 124
-             L374 130
-             C374 134, 372 136, 366 136
-             L338 136
+          d="M342 112
+             L370 112
+             C376 112, 378 116, 378 120
+             L378 126
+             C378 130, 376 132, 370 132
+             L342 132
              Z"
+        />
+        {/* Mirror mount */}
+        <path
+          d="M340 128 L338 132"
+          className="stroke-border/80"
+          strokeWidth={3}
+          strokeLinecap="round"
         />
       </svg>
     </div>
