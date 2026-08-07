@@ -87,8 +87,14 @@ export const listQuotes = createServerFn({ method: "POST" })
     const { data: rows, error, count } = await query.range(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE - 1);
     if (error) throw new Error(error.message);
 
+    const mapped = ((rows ?? []) as unknown as Array<Record<string, unknown>>).map((row) => {
+      const { service_address, ...rest } = row;
+      const address = (service_address ?? {}) as { city?: string };
+      return { ...rest, service_city: address.city ?? null };
+    });
+
     return {
-      rows: (rows ?? []) as unknown as AdminQuoteListItem[],
+      rows: mapped as unknown as AdminQuoteListItem[],
       total: count ?? 0,
       page,
       pageSize: PAGE_SIZE,
