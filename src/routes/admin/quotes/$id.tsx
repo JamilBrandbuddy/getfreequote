@@ -125,9 +125,12 @@ function QuoteDetail() {
 
           <Panel title="Vehicle">
             <Row k="Vehicle" v={[quote["vehicle_year"], quote["vehicle_make"], quote["vehicle_model"], quote["vehicle_trim"]].filter(Boolean).join(" ")} />
+            <Row k="Body style" v={quote["vehicle_body_style"]} />
             <Row k="VIN" v={quote["vin"]} />
-            <Row k="Plate" v={quote["plate"]} />
-            <Row k="Glass features" v={JSON.stringify(quote["glass_features"] ?? {})} />
+            <Row k="Plate" v={quote["licence_plate"]} />
+            {Object.entries(features).map(([k, v]) => (
+              <Row key={k} k={k.replace(/([A-Z])/g, " $1")} v={Array.isArray(v) ? v.join(", ") : v} />
+            ))}
           </Panel>
 
           <Panel title="Job">
