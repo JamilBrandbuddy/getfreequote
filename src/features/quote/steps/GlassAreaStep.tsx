@@ -5,7 +5,7 @@ import { StepFooter } from "../components/StepFooter";
 import { GLASS_AREA_OPTIONS } from "../data/catalog";
 import { useQuoteWizardContext } from "../machine/useQuoteWizard";
 import type { GlassArea } from "../types";
-import { VehicleDiagram } from "../components/VehicleDiagram";
+
 
 const TRIAGE_SYMPTOMS = [
   { value: "cracked", label: "Glass is cracked or chipped", area: "windshield" as GlassArea, service: "replacement" },
@@ -57,8 +57,6 @@ export function GlassAreaStep() {
 
   return (
     <div>
-      <VehicleDiagram value={state.answers.glassArea} onSelect={choose} />
-
       <fieldset className="mt-6">
         <legend className="sr-only">Glass area</legend>
         <div className="grid gap-3 sm:grid-cols-2">
