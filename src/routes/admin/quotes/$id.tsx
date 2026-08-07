@@ -45,9 +45,13 @@ function QuoteDetail() {
 
   const quote = detail.data?.quote as Record<string, unknown> | undefined;
 
+  const notesLoadedFor = useRef<string | null>(null);
   useEffect(() => {
-    if (quote) setNotes(String(quote["internal_notes"] ?? ""));
-  }, [quote]);
+    if (quote && notesLoadedFor.current !== id) {
+      notesLoadedFor.current = id;
+      setNotes(String(quote["internal_notes"] ?? ""));
+    }
+  }, [quote, id]);
 
   const mutation = useMutation({
     mutationFn: (patch: { status?: string; priority?: string; internalNotes?: string }) =>
