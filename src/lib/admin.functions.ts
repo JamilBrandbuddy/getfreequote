@@ -38,7 +38,7 @@ export interface AdminQuoteFilters {
 const PAGE_SIZE = 25;
 
 const LIST_COLUMNS =
-  "id, public_reference, created_at, status, priority, customer_name, customer_phone, customer_email, glass_area, requested_service, insurance_method, vehicle_year, vehicle_make, vehicle_model, service_city, adas_required_review";
+  "id, public_reference, created_at, status, priority, customer_name, customer_phone, customer_email, glass_area, requested_service, insurance_method, vehicle_year, vehicle_make, vehicle_model, service_address, adas_required_review";
 
 /** Confirms the signed-in user may view the admin dashboard. */
 export const getAdminSession = createServerFn({ method: "GET" })
