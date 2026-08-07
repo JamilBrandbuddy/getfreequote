@@ -68,6 +68,8 @@ function QuoteDetail() {
 
   const address = (quote["service_address"] ?? {}) as Record<string, unknown>;
   const damage = (quote["damage_details"] ?? {}) as Record<string, unknown>;
+  const features = (quote["vehicle_features"] ?? {}) as Record<string, unknown>;
+  const insurance = (quote["insurance_details"] ?? {}) as Record<string, unknown>;
 
   return (
     <main className="min-h-screen bg-muted/40 px-4 py-10 sm:px-8">
