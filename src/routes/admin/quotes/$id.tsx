@@ -146,7 +146,9 @@ function QuoteDetail() {
 
           <Panel title="Service & timing">
             <Row k="Insurance" v={quote["insurance_method"]} />
-            <Row k="Claim number" v={quote["insurance_claim_number"]} />
+            {Object.entries(insurance).map(([k, v]) => (
+              <Row key={k} k={k.replace(/([A-Z])/g, " $1")} v={Array.isArray(v) ? v.join(", ") : v} />
+            ))}
             <Row k="Location type" v={quote["service_location_type"]} />
             <Row k="Address" v={[address["streetAddress"], address["city"], address["postalCode"]].filter(Boolean).join(", ")} />
             <Row k="Urgency" v={quote["preferred_urgency"]} />
