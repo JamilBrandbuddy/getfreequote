@@ -38,7 +38,7 @@ export interface AdminQuoteFilters {
 const PAGE_SIZE = 25;
 
 const LIST_COLUMNS =
-  "id, public_reference, created_at, status, priority, customer_name, customer_phone, customer_email, glass_area, requested_service, insurance_method, vehicle_year, vehicle_make, vehicle_model, service_city, adas_required_review";
+  "id, public_reference, created_at, status, priority, customer_name, customer_phone, customer_email, glass_area, requested_service, insurance_method, vehicle_year, vehicle_make, vehicle_model, service_address, adas_required_review";
 
 /** Confirms the signed-in user may view the admin dashboard. */
 export const getAdminSession = createServerFn({ method: "GET" })
@@ -87,8 +87,14 @@ export const listQuotes = createServerFn({ method: "POST" })
     const { data: rows, error, count } = await query.range(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE - 1);
     if (error) throw new Error(error.message);
 
+    const mapped = ((rows ?? []) as unknown as Array<Record<string, unknown>>).map((row) => {
+      const { service_address, ...rest } = row;
+      const address = (service_address ?? {}) as { city?: string };
+      return { ...rest, service_city: address.city ?? null };
+    });
+
     return {
-      rows: (rows ?? []) as unknown as AdminQuoteListItem[],
+      rows: mapped as unknown as AdminQuoteListItem[],
       total: count ?? 0,
       page,
       pageSize: PAGE_SIZE,

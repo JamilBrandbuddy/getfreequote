@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -45,9 +45,13 @@ function QuoteDetail() {
 
   const quote = detail.data?.quote as Record<string, unknown> | undefined;
 
+  const notesLoadedFor = useRef<string | null>(null);
   useEffect(() => {
-    if (quote) setNotes(String(quote["internal_notes"] ?? ""));
-  }, [quote]);
+    if (quote && notesLoadedFor.current !== id) {
+      notesLoadedFor.current = id;
+      setNotes(String(quote["internal_notes"] ?? ""));
+    }
+  }, [quote, id]);
 
   const mutation = useMutation({
     mutationFn: (patch: { status?: string; priority?: string; internalNotes?: string }) =>
@@ -68,6 +72,8 @@ function QuoteDetail() {
 
   const address = (quote["service_address"] ?? {}) as Record<string, unknown>;
   const damage = (quote["damage_details"] ?? {}) as Record<string, unknown>;
+  const features = (quote["vehicle_features"] ?? {}) as Record<string, unknown>;
+  const insurance = (quote["insurance_details"] ?? {}) as Record<string, unknown>;
 
   return (
     <main className="min-h-screen bg-muted/40 px-4 py-10 sm:px-8">
@@ -125,9 +131,12 @@ function QuoteDetail() {
 
           <Panel title="Vehicle">
             <Row k="Vehicle" v={[quote["vehicle_year"], quote["vehicle_make"], quote["vehicle_model"], quote["vehicle_trim"]].filter(Boolean).join(" ")} />
+            <Row k="Body style" v={quote["vehicle_body_style"]} />
             <Row k="VIN" v={quote["vin"]} />
-            <Row k="Plate" v={quote["plate"]} />
-            <Row k="Glass features" v={JSON.stringify(quote["glass_features"] ?? {})} />
+            <Row k="Plate" v={quote["licence_plate"]} />
+            {Object.entries(features).map(([k, v]) => (
+              <Row key={k} k={k.replace(/([A-Z])/g, " $1")} v={Array.isArray(v) ? v.join(", ") : v} />
+            ))}
           </Panel>
 
           <Panel title="Job">
@@ -141,7 +150,9 @@ function QuoteDetail() {
 
           <Panel title="Service & timing">
             <Row k="Insurance" v={quote["insurance_method"]} />
-            <Row k="Claim number" v={quote["insurance_claim_number"]} />
+            {Object.entries(insurance).map(([k, v]) => (
+              <Row key={k} k={k.replace(/([A-Z])/g, " $1")} v={Array.isArray(v) ? v.join(", ") : v} />
+            ))}
             <Row k="Location type" v={quote["service_location_type"]} />
             <Row k="Address" v={[address["streetAddress"], address["city"], address["postalCode"]].filter(Boolean).join(", ")} />
             <Row k="Urgency" v={quote["preferred_urgency"]} />
