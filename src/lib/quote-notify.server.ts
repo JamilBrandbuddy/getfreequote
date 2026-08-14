@@ -4,6 +4,7 @@
  * quote must never be lost because a notification failed.
  */
 import { BUSINESS } from "@/features/quote/data/catalog";
+import { sendTemplateEmail } from "@/lib/email-templates/send-email";
 
 export interface NotificationQuote {
   id: string;
@@ -37,11 +38,6 @@ export interface NotificationQuote {
   utm_term: string | null;
 }
 
-const esc = (v: unknown) =>
-  String(v ?? "—")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
 
 const label = (v: unknown) => (v == null || v === "" ? "—" : String(v).replace(/_/g, " "));
 
@@ -57,95 +53,83 @@ function damageSummary(q: NotificationQuote) {
     .join(" · ");
 }
 
-async function sendEmail(to: string, subject: string, html: string) {
-  const apiKey = process.env["RESEND_API_KEY"];
-  if (!apiKey) {
-    console.warn("[quote-notify] RESEND_API_KEY missing — email skipped:", subject);
-    return false;
-  }
-  const from = process.env["QUOTE_EMAIL_FROM"] ?? `${BUSINESS.name} <quotes@riverbendautoglass.ca>`;
+async function send(
+  template: string,
+  to: string,
+  templateData: Record<string, unknown>,
+  idempotencyKey: string,
+) {
   try {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({ from, to: [to], subject, html }),
-    });
-    if (!res.ok) {
-      console.error(`[quote-notify] Resend failed [${res.status}]: ${await res.text()}`);
+    const result = await sendTemplateEmail(template, to, { templateData, idempotencyKey });
+    if (!result.sent) {
+      console.warn(`[quote-notify] ${template} not sent: ${result.reason}`);
       return false;
     }
     return true;
   } catch (error) {
-    console.error("[quote-notify] Resend request threw", error);
+    console.error(`[quote-notify] ${template} failed`, error);
     return false;
   }
 }
 
 export async function sendAdminNotification(q: NotificationQuote, adminUrl: string) {
   const to = process.env["QUOTE_ADMIN_EMAIL"] ?? BUSINESS.email;
-  const subject = `New Auto Glass Quote — ${q.public_reference} — ${[q.vehicle_year, q.vehicle_make, q.vehicle_model].filter(Boolean).join(" ") || "Vehicle TBC"}`;
-  const row = (k: string, v: unknown) =>
-    `<tr><td style="padding:6px 12px 6px 0;color:#64748b;font-size:13px;vertical-align:top">${esc(k)}</td><td style="padding:6px 0;font-size:14px;color:#0f172a">${esc(label(v))}</td></tr>`;
-
   const address = q.service_address ?? {};
-  const html = `<!doctype html><html><body style="font-family:Arial,Helvetica,sans-serif;background:#ffffff;padding:24px">
-    <div style="max-width:640px;margin:0 auto">
-      <p style="display:inline-block;background:${q.priority === "urgent" ? "#b91c1c" : "#0f2748"};color:#fff;padding:6px 14px;border-radius:999px;font-size:13px;font-weight:bold;margin:0 0 12px">
-        ${esc(q.priority.toUpperCase())} PRIORITY
-      </p>
-      <h1 style="font-size:20px;color:#0f172a;margin:0 0 4px">New quote request ${esc(q.public_reference)}</h1>
-      <p style="color:#64748b;font-size:14px;margin:0 0 20px">${esc(new Date(q.created_at).toLocaleString("en-CA"))}</p>
-      ${q.adas_required_review ? `<p style="background:#fff7ed;border:1px solid #fdba74;color:#9a3412;padding:12px 14px;border-radius:12px;font-size:14px">⚠️ ADAS review required — camera / driver-assist calibration likely.</p>` : ""}
-      <table style="width:100%;border-collapse:collapse">
-        ${row("Requested service", q.requested_service)}
-        ${row("Glass area", q.glass_area)}
-        ${row("Damage summary", damageSummary(q))}
-        ${row("Damage cause", q.damage_cause)}
-        ${row("Insurance", q.insurance_method)}
-        ${row("Vehicle", vehicleOf(q))}
-        ${row("Service location", `${label(q.service_location_type)} — ${esc(address["streetAddress"] ?? "")} ${esc(address["city"] ?? "")} ${esc(address["postalCode"] ?? "")}`)}
-        ${row("Preferred date", `${label(q.preferred_date)} ${label(q.preferred_time)} (${label(q.preferred_urgency)})`)}
-        ${row("Customer", q.customer_name)}
-        ${row("Phone", q.customer_phone)}
-        ${row("Email", q.customer_email)}
-        ${row("Preferred contact", q.preferred_contact_method)}
-        ${row("Notes", q.customer_notes)}
-      </table>
-      <p style="margin:24px 0 0"><a href="${esc(adminUrl)}" style="background:#f59e0b;color:#1c1917;text-decoration:none;padding:12px 20px;border-radius:12px;font-weight:bold;font-size:14px">Open the full record</a></p>
-    </div></body></html>`;
+  const rows = [
+    { label: "Requested service", value: label(q.requested_service) },
+    { label: "Glass area", value: label(q.glass_area) },
+    { label: "Damage summary", value: damageSummary(q) },
+    { label: "Damage cause", value: label(q.damage_cause) },
+    { label: "Insurance", value: label(q.insurance_method) },
+    { label: "Vehicle", value: vehicleOf(q) },
+    {
+      label: "Service location",
+      value: `${label(q.service_location_type)} — ${[address["streetAddress"], address["city"], address["postalCode"]].filter(Boolean).join(", ")}`,
+    },
+    {
+      label: "Preferred date",
+      value: `${label(q.preferred_date)} ${label(q.preferred_time)} (${label(q.preferred_urgency)})`,
+    },
+    { label: "Customer", value: label(q.customer_name) },
+    { label: "Phone", value: label(q.customer_phone) },
+    { label: "Email", value: label(q.customer_email) },
+    { label: "Preferred contact", value: label(q.preferred_contact_method) },
+    { label: "Notes", value: label(q.customer_notes) },
+  ];
 
-  return sendEmail(to, subject, html);
+  return send(
+    "quote-admin-notification",
+    to,
+    {
+      reference: q.public_reference,
+      vehicleLine:
+        [q.vehicle_year, q.vehicle_make, q.vehicle_model].filter(Boolean).join(" ") || "Vehicle TBC",
+      priority: q.priority,
+      submittedAt: new Date(q.created_at).toLocaleString("en-CA"),
+      adasReview: q.adas_required_review,
+      rows,
+      adminUrl,
+    },
+    `quote-admin-${q.id}`,
+  );
 }
 
 export async function sendCustomerConfirmation(q: NotificationQuote) {
   if (!q.customer_email) return false;
-  const subject = `We Received Your Auto Glass Quote Request — ${q.public_reference}`;
-  const html = `<!doctype html><html><body style="font-family:Arial,Helvetica,sans-serif;background:#ffffff;padding:24px">
-    <div style="max-width:600px;margin:0 auto">
-      <h1 style="font-size:22px;color:#0f172a;margin:0 0 12px">Thanks, ${esc(q.customer_name.split(" ")[0])} — we've got your request</h1>
-      <p style="font-size:15px;color:#334155;line-height:1.6">Your reference number is <strong>${esc(q.public_reference)}</strong>. Please quote it when you call.</p>
-      <table style="width:100%;border-collapse:collapse;margin:16px 0;background:#f8fafc;border-radius:12px">
-        <tr><td style="padding:12px 16px;font-size:14px;color:#64748b">Vehicle</td><td style="padding:12px 16px;font-size:14px;color:#0f172a">${esc(vehicleOf(q))}</td></tr>
-        <tr><td style="padding:12px 16px;font-size:14px;color:#64748b">Requested service</td><td style="padding:12px 16px;font-size:14px;color:#0f172a">${esc(label(q.requested_service))}</td></tr>
-      </table>
-      <p style="font-size:15px;color:#334155;line-height:1.6">
-        This is a confirmation that we received your details — your price and your appointment are
-        <strong>not confirmed yet</strong>. One of our advisors will review your request, verify the
-        glass and features for your vehicle, and contact you with a written quote and available times.
-      </p>
-      <h2 style="font-size:16px;color:#0f172a;margin:24px 0 8px">What happens next</h2>
-      <ol style="font-size:15px;color:#334155;line-height:1.7;padding-left:20px;margin:0">
-        <li>We verify your glass and vehicle features.</li>
-        <li>We confirm your ${esc(BUSINESS.shortName ? "SGI" : "insurance")} claim or private pricing.</li>
-        <li>We contact you with your quote and book a time that suits you.</li>
-      </ol>
-      <p style="font-size:15px;color:#334155;line-height:1.6;margin-top:24px">
-        Need us sooner? Call <a href="${esc(BUSINESS.phoneHref)}" style="color:#0f2748;font-weight:bold">${esc(BUSINESS.phone)}</a>.
-      </p>
-      <p style="font-size:13px;color:#94a3b8;margin-top:24px">${esc(BUSINESS.name)}</p>
-    </div></body></html>`;
-
-  return sendEmail(q.customer_email, subject, html);
+  return send(
+    "quote-customer-confirmation",
+    q.customer_email,
+    {
+      firstName: q.customer_name.split(" ")[0] || "there",
+      reference: q.public_reference,
+      vehicle: vehicleOf(q),
+      service: label(q.requested_service),
+      phone: BUSINESS.phone,
+      phoneHref: BUSINESS.phoneHref,
+      businessName: BUSINESS.name,
+    },
+    `quote-customer-${q.id}`,
+  );
 }
 
 /* ----------------------------------------------------------------- webhook */
