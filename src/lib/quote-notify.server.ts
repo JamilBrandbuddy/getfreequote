@@ -4,6 +4,7 @@
  * quote must never be lost because a notification failed.
  */
 import { BUSINESS } from "@/features/quote/data/catalog";
+import { sendTemplateEmail } from "@/lib/email-templates/send-email";
 
 export interface NotificationQuote {
   id: string;
