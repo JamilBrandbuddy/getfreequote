@@ -38,11 +38,6 @@ export interface NotificationQuote {
   utm_term: string | null;
 }
 
-const esc = (v: unknown) =>
-  String(v ?? "—")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
 
 const label = (v: unknown) => (v == null || v === "" ? "—" : String(v).replace(/_/g, " "));
 
