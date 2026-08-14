@@ -15,6 +15,7 @@ import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminQuotesIndexRouteImport } from './routes/admin/quotes/index'
 import { Route as AdminQuotesIdRouteImport } from './routes/admin/quotes/$id'
 import { Route as ApiPublicQuoteSubmissionsRouteImport } from './routes/api/public/quote-submissions'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -47,6 +48,12 @@ const ApiPublicQuoteSubmissionsRoute =
     path: '/api/public/quote-submissions',
     getParentRoute: () => rootRouteImport,
   } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -55,6 +62,7 @@ export interface FileRoutesByFullPath {
   '/admin/quotes/$id': typeof AdminQuotesIdRoute
   '/api/public/quote-submissions': typeof ApiPublicQuoteSubmissionsRoute
   '/admin/quotes/': typeof AdminQuotesIndexRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -63,6 +71,7 @@ export interface FileRoutesByTo {
   '/admin/quotes/$id': typeof AdminQuotesIdRoute
   '/api/public/quote-submissions': typeof ApiPublicQuoteSubmissionsRoute
   '/admin/quotes': typeof AdminQuotesIndexRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -72,6 +81,7 @@ export interface FileRoutesById {
   '/admin/quotes/$id': typeof AdminQuotesIdRoute
   '/api/public/quote-submissions': typeof ApiPublicQuoteSubmissionsRoute
   '/admin/quotes/': typeof AdminQuotesIndexRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -82,6 +92,7 @@ export interface FileRouteTypes {
     | '/admin/quotes/$id'
     | '/api/public/quote-submissions'
     | '/admin/quotes/'
+    | '/lovable/email/transactional/preview'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -90,6 +101,7 @@ export interface FileRouteTypes {
     | '/admin/quotes/$id'
     | '/api/public/quote-submissions'
     | '/admin/quotes'
+    | '/lovable/email/transactional/preview'
   id:
     | '__root__'
     | '/'
@@ -98,6 +110,7 @@ export interface FileRouteTypes {
     | '/admin/quotes/$id'
     | '/api/public/quote-submissions'
     | '/admin/quotes/'
+    | '/lovable/email/transactional/preview'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -107,6 +120,7 @@ export interface RootRouteChildren {
   AdminQuotesIdRoute: typeof AdminQuotesIdRoute
   ApiPublicQuoteSubmissionsRoute: typeof ApiPublicQuoteSubmissionsRoute
   AdminQuotesIndexRoute: typeof AdminQuotesIndexRoute
+  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -153,6 +167,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicQuoteSubmissionsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -163,6 +184,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminQuotesIdRoute: AdminQuotesIdRoute,
   ApiPublicQuoteSubmissionsRoute: ApiPublicQuoteSubmissionsRoute,
   AdminQuotesIndexRoute: AdminQuotesIndexRoute,
+  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
