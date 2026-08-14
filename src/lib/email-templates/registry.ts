@@ -1,5 +1,8 @@
 import type { ComponentType } from 'react'
 
+import { template as quoteAdminNotification } from './quote-admin-notification'
+import { template as quoteCustomerConfirmation } from './quote-customer-confirmation'
+
 export interface TemplateEntry {
   component: ComponentType<any>
   subject: string | ((data: Record<string, any>) => string)
