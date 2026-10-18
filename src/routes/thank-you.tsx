@@ -25,13 +25,23 @@ export const Route = createFileRoute("/thank-you")({
 
 function ThankYou() {
   const [reference, setReference] = useState<string | null>(null);
+  const [checked, setChecked] = useState(false);
   useEffect(() => {
+    let ref: string | null = null;
     try {
-      setReference(sessionStorage.getItem("rb-last-quote-ref"));
+      ref = sessionStorage.getItem("rb-last-quote-ref");
     } catch {
       /* ignore */
     }
+    if (!ref) {
+      window.location.replace("/get-quote");
+      return;
+    }
+    setReference(ref);
+    setChecked(true);
   }, []);
+
+  if (!checked) return <main className="min-h-screen bg-gradient-canvas" />;
 
   return (
     <main className="min-h-screen bg-gradient-canvas px-4 py-12 sm:py-20">
