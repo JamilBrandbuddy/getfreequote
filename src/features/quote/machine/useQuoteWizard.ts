@@ -157,7 +157,13 @@ export function useQuoteWizard(): QuoteWizardApi {
       analytics.generateLead(result.reference);
       clearState();
       fileStore.clear();
-      dispatch({ type: "submitted", reference: result.reference });
+      try {
+        sessionStorage.setItem("rb-last-quote-ref", result.reference);
+      } catch {
+        /* ignore */
+      }
+      dispatch({ type: "reset" });
+      window.location.assign("/thank-you");
     } catch {
       setSubmitError("We couldn't send your request. Please try again, or call us and we'll take it over the phone.");
     } finally {
