@@ -2,12 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Loader2, Paperclip } from "lucide-react";
+import { ArrowLeft, Loader2, Paperclip, Trash2 } from "lucide-react";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { getQuote, updateQuote } from "@/lib/admin.functions";
+import { deleteQuote, getQuote, updateQuote } from "@/lib/admin.functions";
 
 const STATUSES = [
   "new", "contacted", "awaiting-information", "estimating", "quote-sent",
@@ -35,6 +39,17 @@ function QuoteDetail() {
   const queryClient = useQueryClient();
   const fetchQuote = useServerFn(getQuote);
   const saveQuote = useServerFn(updateQuote);
+  const removeQuote = useServerFn(deleteQuote);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const deleteMutation = useMutation({
+    mutationFn: () => removeQuote({ data: { id } }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["admin-quotes"] });
+      void queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
+      void navigate({ to: "/admin/quotes", replace: true });
+    },
+    onError: (e) => setDeleteError(e instanceof Error ? e.message : "Could not delete this quote."),
+  });
 
   const detail = useQuery({ queryKey: ["admin-quote", id], queryFn: () => fetchQuote({ data: { id } }), retry: false });
   const [notes, setNotes] = useState("");
@@ -111,8 +126,36 @@ function QuoteDetail() {
                 ))}
               </SelectContent>
             </Select>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" className="h-11 rounded-xl" disabled={deleteMutation.isPending}>
+                  {deleteMutation.isPending ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <Trash2 className="size-4" aria-hidden />}
+                  Delete
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete {String(quote["public_reference"])}?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This permanently removes the quote, its status history and uploaded photos. This cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => deleteMutation.mutate()}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    Delete permanently
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </header>
+        {deleteError && (
+          <p className="mt-4 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">{deleteError}</p>
+        )}
 
         {Boolean(quote["adas_required_review"]) && (
           <p className="mt-5 rounded-2xl border border-accent/40 bg-accent/10 px-5 py-4 text-sm text-foreground">

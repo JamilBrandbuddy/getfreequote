@@ -175,3 +175,30 @@ export const updateQuote = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+/** Permanently deletes a quote, its history rows and its private attachments. Admins only. */
+export const deleteQuote = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { id: string }) => {
+    if (!input?.id || typeof input.id !== "string") throw new Error("A quote id is required.");
+    return input;
+  })
+  .handler(async ({ data, context }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) throw new Error("Only admins can delete quotes.");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: files } = await supabaseAdmin
+      .from("quote_files")
+      .select("storage_path")
+      .eq("quote_id", data.id);
+    const paths = (files ?? []).map((f) => f.storage_path);
+    if (paths.length) await supabaseAdmin.storage.from("quote-files").remove(paths);
+
+    const { error } = await supabaseAdmin.from("quotes").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
