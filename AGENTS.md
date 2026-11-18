@@ -11,3 +11,4 @@
 
 - Resolve operational permissions from protected user_roles rows using permissionsFor; enforce is_operator in server handlers so UI labels cannot grant access.
 - Retain is_staff as a database compatibility wrapper during role rollout so older published code keeps working.
+- Keep user-role administration in authenticated roles.functions handlers with an Admin check before privileged account lookups; operational permissions must not grant privilege assignment.
