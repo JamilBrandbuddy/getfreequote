@@ -19,7 +19,7 @@ export const listRoleAssignments = createServerFn({ method: "GET" })
 
 export const changeRoleAssignment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(z.object({ assignmentId: z.uuid(), role: z.enum(["admin", "marketing"]) }))
+  .inputValidator(z.object({ assignmentId: z.string().uuid(), role: z.enum(["admin", "marketing"]) }))
   .handler(async ({ data, context }) => {
     const { data: allowed, error } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
     if (error || !allowed) throw new Error("Only Admin can manage user roles.");
