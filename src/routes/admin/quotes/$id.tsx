@@ -215,7 +215,7 @@ function QuoteDetail() {
                       href={file.url ?? "#"}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+                      className="inline-flex max-w-full flex-wrap items-center gap-2 text-sm font-medium text-primary hover:underline [overflow-wrap:anywhere]"
                     >
                       <Paperclip className="size-4" aria-hidden />
                       {file.original_filename}
@@ -279,7 +279,7 @@ function QuoteDetail() {
 
 function Panel({ title, children, className = "" }: { title: string; children: React.ReactNode; className?: string }) {
   return (
-    <section className={`rounded-2xl border border-border bg-card p-5 shadow-soft ${className}`}>
+    <section className={`min-w-0 rounded-2xl border border-border bg-card p-5 shadow-soft ${className}`}>
       <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">{title}</h2>
       <div className="mt-3 space-y-2">{children}</div>
     </section>
@@ -290,7 +290,7 @@ function Row({ k, v }: { k: string; v: unknown }) {
   return (
     <p className="grid grid-cols-1 gap-1 text-sm sm:grid-cols-[10rem_1fr] sm:gap-3">
       <span className="capitalize text-muted-foreground">{k}</span>
-      <span className="break-words text-foreground">{label(v)}</span>
+      <span className="min-w-0 text-foreground [overflow-wrap:anywhere]">{label(v)}</span>
     </p>
   );
 }
