@@ -1,9 +1,7 @@
-# Phase 2 — Admin and Marketing roles
+# Phase 3 — Monthly analytics and advanced exports
 
-- [x] Add Marketing authorization while retaining the legacy Staff compatibility path.
-- [x] Preserve Sales Admin; change the existing Jamil account's role only.
-- [x] Update shared dashboard labels, deletion access, and Admin-only role administration.
-- [x] Test permission rules, both account sessions, protected calls, and data preservation.
-- [x] Record exact changes and non-destructive rollback instructions.
-
-Backup verification was explicitly deferred by the user for this phase. Do not publish or start Phase 3.
+- [x] Add shared Regina-time date filtering and database aggregates without altering existing records.
+- [x] Add month/range controls, analytics, and cross-page selection to the existing dashboard.
+- [x] Add protected CSV and genuine XLSX exports for all, filtered, selected, months and ranges.
+- [x] Verify regression rules, authenticated downloads, pagination, unauthorized access and data preservation.
+- [x] Record test results and every modified file. Do not publish or begin Phase 4.

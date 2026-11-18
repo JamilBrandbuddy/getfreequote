@@ -3,6 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
 import { permissionsFor } from "./permissions";
+import { reportingFiltersSchema, type ReportingFilters } from "./quote-reporting";
 
 type QuoteStatus = Database["public"]["Enums"]["quote_status"];
 type QuotePriority = Database["public"]["Enums"]["quote_priority"];
@@ -27,19 +28,9 @@ export interface AdminQuoteListItem {
   adas_required_review: boolean;
 }
 
-export interface AdminQuoteFilters {
-  search?: string;
-  status?: string;
-  priority?: string;
-  insurance?: string;
-  sort?: "newest" | "oldest" | "priority";
-  page?: number;
-}
+export type AdminQuoteFilters = ReportingFilters;
 
 const PAGE_SIZE = 25;
-
-const LIST_COLUMNS =
-  "id, public_reference, created_at, status, priority, customer_name, customer_phone, customer_email, glass_area, requested_service, insurance_method, vehicle_year, vehicle_make, vehicle_model, service_address, adas_required_review";
 
 /** Confirms the signed-in user may view the admin dashboard. */
 export const getAdminSession = createServerFn({ method: "GET" })
@@ -58,32 +49,16 @@ export const getAdminSession = createServerFn({ method: "GET" })
 
 export const listQuotes = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: AdminQuoteFilters) => input ?? {})
+  .inputValidator(reportingFiltersSchema)
   .handler(async ({ data, context }) => {
     const { data: permitted, error: accessError } = await context.supabase.rpc("is_operator", { _user_id: context.userId });
     if (accessError || !permitted) throw new Error("Dashboard access required.");
     const page = Math.max(0, data.page ?? 0);
-    let query = context.supabase.from("quotes").select(LIST_COLUMNS, { count: "exact" });
-
-    if (data.status && data.status !== "all") query = query.eq("status", data.status as QuoteStatus);
-    if (data.priority && data.priority !== "all") query = query.eq("priority", data.priority as QuotePriority);
-    if (data.insurance && data.insurance !== "all") query = query.eq("insurance_method", data.insurance);
-
-    const search = data.search?.trim();
-    if (search) {
-      const term = `%${search.replace(/[%,]/g, "")}%`;
-      query = query.or(
-        `public_reference.ilike.${term},customer_name.ilike.${term},customer_phone.ilike.${term},customer_email.ilike.${term},vehicle_make.ilike.${term},vehicle_model.ilike.${term}`,
-      );
-    }
-
-    if (data.sort === "oldest") query = query.order("created_at", { ascending: true });
-    else if (data.sort === "priority")
-      query = query.order("priority", { ascending: true }).order("created_at", { ascending: false });
-    else query = query.order("created_at", { ascending: false });
-
-    const { data: rows, error, count } = await query.range(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE - 1);
+    const { data: report, error } = await context.supabase.rpc("quote_reporting", {
+      filters: { ...data, search: data.search?.trim() ?? "" }, row_offset: page * PAGE_SIZE, row_limit: PAGE_SIZE,
+    });
     if (error) throw new Error(error.message);
+    const { rows, total } = report as unknown as { rows: Record<string, unknown>[]; total: number };
 
     const mapped = ((rows ?? []) as unknown as Array<Record<string, unknown>>).map((row) => {
       const { service_address, ...rest } = row;
@@ -93,7 +68,7 @@ export const listQuotes = createServerFn({ method: "POST" })
 
     return {
       rows: mapped as unknown as AdminQuoteListItem[],
-      total: count ?? 0,
+      total,
       page,
       pageSize: PAGE_SIZE,
     };

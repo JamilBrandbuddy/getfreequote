@@ -14,7 +14,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { getAdminSession, getQuoteStats, listQuotes } from "@/lib/admin.functions";
+import { getAdminSession, listQuotes } from "@/lib/admin.functions";
+import { getQuoteAnalytics } from "@/lib/quote-reports.functions";
+import type { ReportingFilters } from "@/lib/quote-reporting";
+import { DateFilters, AnalyticsView, QuoteExport } from "@/components/admin/QuoteReporting";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const STATUSES = [
   "new",
@@ -59,7 +63,7 @@ function AdminQuotes() {
   const queryClient = useQueryClient();
   const fetchSession = useServerFn(getAdminSession);
   const fetchQuotes = useServerFn(listQuotes);
-  const fetchStats = useServerFn(getQuoteStats);
+  const fetchStats = useServerFn(getQuoteAnalytics);
 
   const [search, setSearch] = useState("");
   const [debounced, setDebounced] = useState("");
@@ -67,6 +71,14 @@ function AdminQuotes() {
   const [priority, setPriority] = useState("all");
   const [sort, setSort] = useState<"newest" | "oldest" | "priority">("newest");
   const [page, setPage] = useState(0);
+  const [period, setPeriod] = useState<ReportingFilters>({});
+  const [service, setService] = useState("all");
+  const [selected, setSelected] = useState<string[]>([]);
+  const [allMatching, setAllMatching] = useState(false);
+  const [resetKey, setResetKey] = useState(0);
+  const filters = { ...period, search: debounced.trim(), status, priority, service, sort };
+  const filterKey = JSON.stringify(filters);
+  useEffect(() => { setSelected([]); setAllMatching(false); setPage(0); }, [filterKey]);
 
   useEffect(() => {
     const id = setTimeout(() => {
@@ -83,14 +95,14 @@ function AdminQuotes() {
   }, [session.isError, navigate]);
 
   const stats = useQuery({
-    queryKey: ["admin-stats"],
-    queryFn: () => fetchStats({}),
+    queryKey: ["admin-stats", filterKey],
+    queryFn: () => fetchStats({ data: filters }),
     enabled: session.data?.canOperate === true,
   });
 
   const quotes = useQuery({
-    queryKey: ["admin-quotes", debounced, status, priority, sort, page],
-    queryFn: () => fetchQuotes({ data: { search: debounced, status, priority, sort, page } }),
+    queryKey: ["admin-quotes", filterKey, page],
+    queryFn: () => fetchQuotes({ data: { ...filters, page } }),
     enabled: session.data?.canOperate === true,
   });
 
@@ -138,6 +150,7 @@ function AdminQuotes() {
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
+          <QuoteExport filters={filters} months={stats.data?.availableMonths ?? []} selectedIds={selected} allMatching={allMatching} total={quotes.data?.total ?? 0} />
           {session.data?.canManageRoles && <Button asChild variant="outline" className="h-11 rounded-xl"><Link to="/admin/users">User roles</Link></Button>}
           <Button variant="outline" onClick={signOut} className="h-11 rounded-xl">
             <LogOut className="size-4" aria-hidden />
@@ -150,10 +163,11 @@ function AdminQuotes() {
           <StatCard label="New requests" value={stats.data?.newCount} icon={<Inbox className="size-5" />} />
           <StatCard label="Urgent" value={stats.data?.urgent} icon={<AlertTriangle className="size-5" />} />
           <StatCard label="Last 7 days" value={stats.data?.lastSevenDays} icon={<TrendingUp className="size-5" />} />
-          <StatCard label="All quotes" value={stats.data?.total} icon={<Inbox className="size-5" />} />
+          <StatCard label="Total quotes" value={stats.data?.total} icon={<Inbox className="size-5" />} />
         </section>
 
-        <section className="mt-6 grid gap-3 rounded-2xl border border-border bg-card p-4 shadow-soft md:grid-cols-[1fr_auto_auto_auto]">
+        <section className="mt-6 border-y border-border py-4">
+        <div className="grid gap-3 md:grid-cols-[1fr_auto_auto_auto]">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
             <Input
@@ -173,7 +187,21 @@ function AdminQuotes() {
             options={["newest", "oldest", "priority"]}
             includeAll={false}
           />
+        </div>
+        <div className="mt-3 flex flex-wrap gap-3">
+          <FilterSelect label="Service" value={service} onChange={setService} options={stats.data?.services ?? []} />
+          <Button variant="ghost" onClick={() => { setSearch(""); setDebounced(""); setStatus("all"); setPriority("all"); setService("all"); setSort("newest"); setPeriod({}); setResetKey((k) => k + 1); }}>Reset filters</Button>
+        </div>
+        <DateFilters key={resetKey} value={period} availableMonths={stats.data?.availableMonths ?? []} onChange={setPeriod} />
         </section>
+        {(stats.isError || quotes.isError) && <p role="alert" className="mt-4 text-sm text-destructive">Could not load quotes. Check the date range and try again.</p>}
+        <AnalyticsView data={stats.data} />
+        <div className="mt-5 flex flex-wrap items-center gap-3 text-sm">
+          <label className="flex items-center gap-2"><Checkbox aria-label="Select this page" checked={!!quotes.data?.rows.length && (allMatching || quotes.data.rows.every((q) => selected.includes(q.id)))} onCheckedChange={(checked) => { setAllMatching(false); const ids = quotes.data?.rows.map((q) => q.id) ?? []; setSelected((s) => checked ? [...new Set([...s, ...ids])] : s.filter((id) => !ids.includes(id))); }} />Select this page</label>
+          <span>{allMatching ? total : selected.length} selected</span>
+          <Button variant="ghost" disabled={!total} onClick={() => { setAllMatching(true); setSelected([]); }}>Select all {total} matching</Button>
+          {(allMatching || selected.length > 0) && <Button variant="ghost" onClick={() => { setAllMatching(false); setSelected([]); }}>Clear selection</Button>}
+        </div>
 
         <section className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
           {quotes.isPending ? (
@@ -183,11 +211,12 @@ function AdminQuotes() {
           ) : (
             <ul className="divide-y divide-border">
               {quotes.data?.rows.map((q) => (
-                <li key={q.id}>
+                <li key={q.id} className="flex items-center pl-4">
+                  <Checkbox aria-label={`Select ${q.public_reference}`} disabled={allMatching} checked={allMatching || selected.includes(q.id)} onCheckedChange={(checked) => setSelected((s) => checked ? [...new Set([...s, q.id])] : s.filter((id) => id !== q.id))} />
                   <Link
                     to="/admin/quotes/$id"
                     params={{ id: q.id }}
-                    className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-4 transition hover:bg-muted/60"
+                    className="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-2 px-5 py-4 transition hover:bg-muted/60"
                   >
                     <span className="min-w-[9rem] font-mono text-sm font-semibold text-foreground">
                       {q.public_reference}
@@ -208,7 +237,7 @@ function AdminQuotes() {
                       {q.status.replace(/-/g, " ")}
                     </span>
                     <span className="text-xs text-muted-foreground">
-                      {new Date(q.created_at).toLocaleDateString("en-CA")}
+                      {new Date(q.created_at).toLocaleDateString("en-CA", { timeZone: "America/Regina" })}
                     </span>
                   </Link>
                 </li>

@@ -12,3 +12,5 @@
 - Resolve operational permissions from protected user_roles rows using permissionsFor; enforce is_operator in server handlers so UI labels cannot grant access.
 - Retain is_staff as a database compatibility wrapper during role rollout so older published code keeps working.
 - Keep user-role administration in authenticated roles.functions handlers with an Admin check before privileged account lookups; operational permissions must not grant privilege assignment.
+- Use filtered_reporting_quotes for list, analytics and exports so combined filters and Regina boundaries cannot diverge; aggregate in SQL and paginate exports on the server.
+- Generate XLSX in memory through the maintained SheetJS distribution inside server-only export helpers to avoid filesystem-dependent writers in the Worker; export explicit safe columns only.
