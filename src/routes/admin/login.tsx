@@ -11,9 +11,13 @@ export const Route = createFileRoute("/admin/login")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Staff Sign In — Riverbend Autoglass" },
-      { name: "description", content: "Secure sign in for Riverbend Autoglass staff to manage incoming quote requests." },
+      { title: "Team Sign In — Riverbend Autoglass" },
+      { name: "description", content: "Sign in to the Riverbend Autoglass operational dashboard." },
       { name: "robots", content: "noindex, nofollow" },
+      { property: "og:title", content: "Team Sign In — Riverbend Autoglass" },
+      { property: "og:description", content: "Sign in to the Riverbend Autoglass dashboard." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AdminLogin,
@@ -51,9 +55,9 @@ function AdminLogin() {
         <span className="grid size-12 place-items-center rounded-2xl bg-primary text-primary-foreground">
           <ShieldCheck className="size-6" aria-hidden />
         </span>
-        <h1 className="mt-5 text-2xl font-semibold text-foreground">Staff sign in</h1>
+        <h1 className="mt-5 text-2xl font-semibold text-foreground">Team sign in</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Riverbend Autoglass quote dashboard. Staff accounts only.
+          Riverbend Autoglass · Admin & Marketing
         </p>
 
         <form onSubmit={onSubmit} className="mt-6 space-y-4">

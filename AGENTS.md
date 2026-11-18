@@ -8,3 +8,6 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Resolve operational permissions from protected user_roles rows using permissionsFor; enforce is_operator in server handlers so UI labels cannot grant access.
+- Retain is_staff as a database compatibility wrapper during role rollout so older published code keeps working.

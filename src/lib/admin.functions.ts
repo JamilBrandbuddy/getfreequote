@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
+import { permissionsFor } from "./permissions";
 
 type QuoteStatus = Database["public"]["Enums"]["quote_status"];
 type QuotePriority = Database["public"]["Enums"]["quote_priority"];
@@ -44,19 +45,14 @@ const LIST_COLUMNS =
 export const getAdminSession = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
-    const { data: isStaff } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "staff",
-    });
+    const { data: roles, error } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId);
+    if (error) throw new Error("Could not verify account permissions.");
+    const permissions = permissionsFor((roles ?? []).map((r) => r.role));
     return {
       userId: context.userId,
       email: (context.claims as { email?: string } | null)?.email ?? null,
-      isAdmin: Boolean(isAdmin),
-      isStaff: Boolean(isAdmin) || Boolean(isStaff),
+      ...permissions,
+      isStaff: permissions.canOperate,
     };
   });
 
@@ -64,6 +60,8 @@ export const listQuotes = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: AdminQuoteFilters) => input ?? {})
   .handler(async ({ data, context }) => {
+    const { data: permitted, error: accessError } = await context.supabase.rpc("is_operator", { _user_id: context.userId });
+    if (accessError || !permitted) throw new Error("Dashboard access required.");
     const page = Math.max(0, data.page ?? 0);
     let query = context.supabase.from("quotes").select(LIST_COLUMNS, { count: "exact" });
 
@@ -104,6 +102,8 @@ export const listQuotes = createServerFn({ method: "POST" })
 export const getQuoteStats = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    const { data: permitted, error: accessError } = await context.supabase.rpc("is_operator", { _user_id: context.userId });
+    if (accessError || !permitted) throw new Error("Dashboard access required.");
     const { data, error } = await context.supabase.from("quotes").select("status, priority, created_at");
     if (error) throw new Error(error.message);
 
@@ -125,6 +125,8 @@ export const getQuote = createServerFn({ method: "POST" })
     return input;
   })
   .handler(async ({ data, context }) => {
+    const { data: permitted, error: accessError } = await context.supabase.rpc("is_operator", { _user_id: context.userId });
+    if (accessError || !permitted) throw new Error("Dashboard access required.");
     const { data: quote, error } = await context.supabase
       .from("quotes")
       .select("*")
@@ -165,6 +167,8 @@ export const updateQuote = createServerFn({ method: "POST" })
     return input;
   })
   .handler(async ({ data, context }) => {
+    const { data: permitted, error: accessError } = await context.supabase.rpc("is_operator", { _user_id: context.userId });
+    if (accessError || !permitted) throw new Error("Dashboard access required.");
     const patch: QuoteUpdate = {};
     if (data.status) patch.status = data.status as QuoteStatus;
     if (data.priority) patch.priority = data.priority as QuotePriority;
@@ -176,7 +180,7 @@ export const updateQuote = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-/** Permanently deletes a quote, its history rows and its private attachments. Admins only. */
+/** Permanently deletes a quote, its history and attachments. Operational accounts only. */
 export const deleteQuote = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { id: string }) => {
@@ -184,11 +188,8 @@ export const deleteQuote = createServerFn({ method: "POST" })
     return input;
   })
   .handler(async ({ data, context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
-    if (!isAdmin) throw new Error("Only admins can delete quotes.");
+    const { data: permitted, error: accessError } = await context.supabase.rpc("is_operator", { _user_id: context.userId });
+    if (accessError || !permitted) throw new Error("Dashboard access required.");
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: files } = await supabaseAdmin
@@ -196,7 +197,10 @@ export const deleteQuote = createServerFn({ method: "POST" })
       .select("storage_path")
       .eq("quote_id", data.id);
     const paths = (files ?? []).map((f) => f.storage_path);
-    if (paths.length) await supabaseAdmin.storage.from("quote-files").remove(paths);
+    if (paths.length) {
+      const { error: removalError } = await supabaseAdmin.storage.from("quote-files").remove(paths);
+      if (removalError) throw new Error("Could not remove attachments. Quote was not deleted.");
+    }
 
     const { error } = await supabaseAdmin.from("quotes").delete().eq("id", data.id);
     if (error) throw new Error(error.message);

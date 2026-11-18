@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as GetQuoteRouteImport } from './routes/get-quote'
 import { Route as ThankYouRouteImport } from './routes/thank-you'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
+import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminQuotesIndexRouteImport } from './routes/admin/quotes/index'
 import { Route as AdminQuotesIdRouteImport } from './routes/admin/quotes/$id'
 import { Route as ApiPublicQuoteSubmissionsRouteImport } from './routes/api/public/quote-submissions'
@@ -36,6 +37,11 @@ const ThankYouRoute = ThankYouRouteImport.update({
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin/login',
   path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/admin/users',
+  path: '/admin/users',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminQuotesIndexRoute = AdminQuotesIndexRouteImport.update({
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/get-quote': typeof GetQuoteRoute
   '/thank-you': typeof ThankYouRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/users': typeof AdminUsersRoute
   '/admin/quotes/$id': typeof AdminQuotesIdRoute
   '/api/public/quote-submissions': typeof ApiPublicQuoteSubmissionsRoute
   '/admin/quotes/': typeof AdminQuotesIndexRoute
@@ -76,6 +83,7 @@ export interface FileRoutesByTo {
   '/get-quote': typeof GetQuoteRoute
   '/thank-you': typeof ThankYouRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/users': typeof AdminUsersRoute
   '/admin/quotes/$id': typeof AdminQuotesIdRoute
   '/api/public/quote-submissions': typeof ApiPublicQuoteSubmissionsRoute
   '/admin/quotes': typeof AdminQuotesIndexRoute
@@ -87,6 +95,7 @@ export interface FileRoutesById {
   '/get-quote': typeof GetQuoteRoute
   '/thank-you': typeof ThankYouRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/users': typeof AdminUsersRoute
   '/admin/quotes/$id': typeof AdminQuotesIdRoute
   '/api/public/quote-submissions': typeof ApiPublicQuoteSubmissionsRoute
   '/admin/quotes/': typeof AdminQuotesIndexRoute
@@ -99,6 +108,7 @@ export interface FileRouteTypes {
     | '/get-quote'
     | '/thank-you'
     | '/admin/login'
+    | '/admin/users'
     | '/admin/quotes/$id'
     | '/api/public/quote-submissions'
     | '/admin/quotes/'
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/get-quote'
     | '/thank-you'
     | '/admin/login'
+    | '/admin/users'
     | '/admin/quotes/$id'
     | '/api/public/quote-submissions'
     | '/admin/quotes'
@@ -119,6 +130,7 @@ export interface FileRouteTypes {
     | '/get-quote'
     | '/thank-you'
     | '/admin/login'
+    | '/admin/users'
     | '/admin/quotes/$id'
     | '/api/public/quote-submissions'
     | '/admin/quotes/'
@@ -130,6 +142,7 @@ export interface RootRouteChildren {
   GetQuoteRoute: typeof GetQuoteRoute
   ThankYouRoute: typeof ThankYouRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminUsersRoute: typeof AdminUsersRoute
   AdminQuotesIdRoute: typeof AdminQuotesIdRoute
   ApiPublicQuoteSubmissionsRoute: typeof ApiPublicQuoteSubmissionsRoute
   AdminQuotesIndexRoute: typeof AdminQuotesIndexRoute
@@ -164,6 +177,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/login'
       fullPath: '/admin/login'
       preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/admin/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/quotes/': {
@@ -202,6 +222,7 @@ const rootRouteChildren: RootRouteChildren = {
   GetQuoteRoute: GetQuoteRoute,
   ThankYouRoute: ThankYouRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AdminUsersRoute: AdminUsersRoute,
   AdminQuotesIdRoute: AdminQuotesIdRoute,
   ApiPublicQuoteSubmissionsRoute: ApiPublicQuoteSubmissionsRoute,
   AdminQuotesIndexRoute: AdminQuotesIndexRoute,

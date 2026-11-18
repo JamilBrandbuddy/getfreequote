@@ -26,6 +26,10 @@ export const Route = createFileRoute("/admin/quotes/$id")({
       { title: "Quote Detail — Riverbend Autoglass Admin" },
       { name: "description", content: "Full detail, attachments and status history for a Riverbend Autoglass quote request." },
       { name: "robots", content: "noindex, nofollow" },
+      { property: "og:title", content: "Quote Detail — Riverbend Autoglass" },
+      { property: "og:description", content: "Quote details, attachments and status history." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: QuoteDetail,
@@ -105,7 +109,7 @@ function QuoteDetail() {
               Submitted {new Date(String(quote["created_at"])).toLocaleString("en-CA")}
             </p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             <Select value={String(quote["status"])} onValueChange={(v) => mutation.mutate({ status: v })}>
               <SelectTrigger className="h-11 w-48 rounded-xl" aria-label="Quote status">
                 <SelectValue />
@@ -284,7 +288,7 @@ function Panel({ title, children, className = "" }: { title: string; children: R
 
 function Row({ k, v }: { k: string; v: unknown }) {
   return (
-    <p className="grid grid-cols-[10rem_1fr] gap-3 text-sm">
+    <p className="grid grid-cols-1 gap-1 text-sm sm:grid-cols-[10rem_1fr] sm:gap-3">
       <span className="capitalize text-muted-foreground">{k}</span>
       <span className="break-words text-foreground">{label(v)}</span>
     </p>

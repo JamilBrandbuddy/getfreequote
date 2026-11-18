@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AlertTriangle, Inbox, Loader2, LogOut, Search, TrendingUp } from "lucide-react";
 
@@ -45,6 +45,10 @@ export const Route = createFileRoute("/admin/quotes/")({
       { title: "Quote Requests — Riverbend Autoglass Admin" },
       { name: "description", content: "Review, filter and manage incoming Riverbend Autoglass quote requests." },
       { name: "robots", content: "noindex, nofollow" },
+      { property: "og:title", content: "Quote Requests — Riverbend Autoglass" },
+      { property: "og:description", content: "Manage Riverbend Autoglass quote requests." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AdminQuotes,
@@ -52,6 +56,7 @@ export const Route = createFileRoute("/admin/quotes/")({
 
 function AdminQuotes() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const fetchSession = useServerFn(getAdminSession);
   const fetchQuotes = useServerFn(listQuotes);
   const fetchStats = useServerFn(getQuoteStats);
@@ -80,16 +85,18 @@ function AdminQuotes() {
   const stats = useQuery({
     queryKey: ["admin-stats"],
     queryFn: () => fetchStats({}),
-    enabled: session.data?.isStaff === true,
+    enabled: session.data?.canOperate === true,
   });
 
   const quotes = useQuery({
     queryKey: ["admin-quotes", debounced, status, priority, sort, page],
     queryFn: () => fetchQuotes({ data: { search: debounced, status, priority, sort, page } }),
-    enabled: session.data?.isStaff === true,
+    enabled: session.data?.canOperate === true,
   });
 
   const signOut = async () => {
+    await queryClient.cancelQueries();
+    queryClient.clear();
     await supabase.auth.signOut();
     void navigate({ to: "/admin/login", replace: true });
   };
@@ -102,12 +109,12 @@ function AdminQuotes() {
     );
   }
 
-  if (session.data && !session.data.isStaff) {
+  if (session.data && !session.data.canOperate) {
     return (
       <main className="grid min-h-screen place-items-center px-4 text-center">
         <div>
           <h1 className="text-xl font-semibold text-foreground">This account has no dashboard access</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Ask an administrator to grant you staff access.</p>
+          <p className="mt-2 text-sm text-muted-foreground">Ask an administrator to grant you dashboard access.</p>
           <Button onClick={signOut} variant="outline" className="mt-6 h-12 rounded-xl">
             Sign out
           </Button>
@@ -127,13 +134,16 @@ function AdminQuotes() {
           <div>
             <h1 className="text-2xl font-semibold text-foreground">Quote requests</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Signed in as {session.data?.email ?? "staff"}
+              Signed in as {session.data?.email ?? "team member"} · {session.data?.roleLabel}
             </p>
           </div>
+          <div className="flex flex-wrap gap-2">
+          {session.data?.canManageRoles && <Button asChild variant="outline" className="h-11 rounded-xl"><Link to="/admin/users">User roles</Link></Button>}
           <Button variant="outline" onClick={signOut} className="h-11 rounded-xl">
             <LogOut className="size-4" aria-hidden />
             Sign out
           </Button>
+          </div>
         </header>
 
         <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
