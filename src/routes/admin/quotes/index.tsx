@@ -74,13 +74,12 @@ function AdminQuotes() {
   const [page, setPage] = useState(0);
   const [period, setPeriod] = useState<ReportingFilters>({});
   const [service, setService] = useState("all");
-  const [insurance, setInsurance] = useState("all");
   const [conversion, setConversion] = useState<"all" | "pending" | "converted" | "not_converted">("all");
   const [regions, setRegions] = useState<string[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
   const [allMatching, setAllMatching] = useState(false);
   const [resetKey, setResetKey] = useState(0);
-  const filters = { ...period, search: debounced.trim(), status, priority, service, insurance, conversion, sort, regions };
+  const filters = { ...period, search: debounced.trim(), status, priority, service: service === "sgi_any" ? "all" : service, insurance: service === "sgi_any" ? "sgi_any" : "all", conversion, sort, regions };
   const filterKey = JSON.stringify(filters);
   useEffect(() => { setSelected([]); setAllMatching(false); setPage(0); }, [filterKey]);
 
@@ -196,11 +195,10 @@ function AdminQuotes() {
           />
         </div>
         <div className="mt-3 flex flex-wrap gap-3">
-          <FilterSelect label="Service" value={service} onChange={setService} options={stats.data?.services ?? []} />
-          <FilterSelect label="SGI / Payment" value={insurance} onChange={setInsurance} options={["sgi_any", "sgi_new", "sgi_started", "private", "other_insurer", "not_sure"]} />
+          <FilterSelect label="Service" value={service} onChange={setService} options={[...(stats.data?.services ?? []), "sgi_any"]} />
           <FilterSelect label="Conversion" value={conversion} onChange={(v) => setConversion(v as typeof conversion)} options={["pending", "converted", "not_converted"]} />
           <RegionFilter value={regions} onChange={setRegions} />
-          <Button variant="ghost" onClick={() => { setSearch(""); setDebounced(""); setStatus("all"); setPriority("all"); setService("all"); setInsurance("all"); setConversion("all"); setRegions([]); setSort("newest"); setPeriod({}); setResetKey((k) => k + 1); }}>Reset filters</Button>
+          <Button variant="ghost" onClick={() => { setSearch(""); setDebounced(""); setStatus("all"); setPriority("all"); setService("all"); setConversion("all"); setRegions([]); setSort("newest"); setPeriod({}); setResetKey((k) => k + 1); }}>Reset filters</Button>
         </div>
         <DateFilters key={resetKey} value={period} availableMonths={stats.data?.availableMonths ?? []} onChange={setPeriod} />
         </section>
@@ -294,7 +292,7 @@ function StatCard({ label, value, icon }: { label: string; value?: number; icon:
   );
 }
 
-const OPTION_LABELS: Record<string, string> = { sgi_any: "All SGI customers", sgi_new: "SGI – new claim", sgi_started: "SGI – claim started", private: "Private pay", other_insurer: "Other insurer", not_sure: "Not sure" };
+const OPTION_LABELS: Record<string, string> = { sgi_any: "SGI Insurance Claim", sgi_new: "SGI – new claim", sgi_started: "SGI – claim started", private: "Private pay", other_insurer: "Other insurer", not_sure: "Not sure" };
 
 function FilterSelect({
   label,
@@ -315,7 +313,7 @@ function FilterSelect({
         <SelectValue placeholder={label} />
       </SelectTrigger>
       <SelectContent>
-        {includeAll && <SelectItem value="all">{label === "SGI / Payment" ? "All payment types" : `All ${label.toLowerCase()}`}</SelectItem>}
+        {includeAll && <SelectItem value="all">All {label.toLowerCase()}</SelectItem>}
         {options.map((option) => (
           <SelectItem key={option} value={option} className="capitalize">
             {OPTION_LABELS[option] ?? option.replace(/[-_]/g, " ")}
