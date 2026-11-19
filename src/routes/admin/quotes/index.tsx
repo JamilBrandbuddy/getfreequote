@@ -230,19 +230,19 @@ function AdminQuotes() {
                   <Link
                     to="/admin/quotes/$id"
                     params={{ id: q.id }}
-                    className="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-2 px-5 py-4 transition hover:bg-muted/60"
+                    className="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-2 px-5 py-4 transition hover:bg-muted/60 lg:grid lg:grid-cols-[11rem_minmax(12rem,1fr)_4.5rem_9rem_5.5rem_7.5rem_8.5rem_6rem] lg:justify-items-start"
                   >
                     <span className="min-w-[9rem] font-mono text-sm font-semibold text-foreground">
                       {q.public_reference}
                     </span>
-                    <span className="min-w-[10rem] flex-1 text-sm text-foreground">
+                    <span className="min-w-[10rem] flex-1 text-sm text-foreground lg:min-w-0 lg:w-full">
                       {q.customer_name}
                       <span className="block text-xs text-muted-foreground">
                         {[q.vehicle_year, q.vehicle_make, q.vehicle_model].filter(Boolean).join(" ") || "Vehicle TBC"}
                       </span>
                     </span>
                     <span className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground" title="Phone area code region">{regionLabel(q.phone_region)}</span>
-                    <span className="text-xs capitalize text-muted-foreground">
+                    <span className="truncate text-xs capitalize text-muted-foreground lg:max-w-full">
                       {(q.requested_service ?? "—").replace(/_/g, " ")}
                     </span>
                     <span className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${priorityClass[q.priority] ?? ""}`}>
@@ -256,7 +256,7 @@ function AdminQuotes() {
                       {new Date(q.created_at).toLocaleDateString("en-CA", { timeZone: "America/Regina" })}
                     </span>
                   </Link>
-                  <div className="pr-4"><ConversionControl compact quoteId={q.id} reference={q.public_reference} value={q.conversion_status ?? "pending"} /></div>
+                  <div className="pr-4 lg:shrink-0"><ConversionControl compact quoteId={q.id} reference={q.public_reference} value={q.conversion_status ?? "pending"} /></div>
                 </li>
               ))}
             </ul>
