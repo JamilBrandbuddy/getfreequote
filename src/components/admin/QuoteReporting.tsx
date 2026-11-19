@@ -70,7 +70,7 @@ function Breakdown({ title, rows }: { title: string; rows: { label: string; coun
   return <div><h3 className="mb-3 text-sm font-medium">{title}</h3><ul className="space-y-2 text-sm">{rows.map((r) => <li key={r.label} className="flex justify-between gap-3"><span className="capitalize text-muted-foreground">{r.label.replace(/[-_]/g, " ")}</span><span className="font-semibold">{r.count}</span></li>)}</ul></div>;
 }
 
-export function QuoteExport({ filters, months, selectedIds, allMatching, total }: { filters: ReportingFilters; months: string[]; selectedIds: string[]; allMatching: boolean; total: number }) {
+export function QuoteExport({ filters, months, selectedIds, allMatching, total, triggerClassName }: { filters: ReportingFilters; months: string[]; selectedIds: string[]; allMatching: boolean; total: number; triggerClassName?: string }) {
   const prepare = useServerFn(prepareQuoteExport);
   const [scope, setScope] = useState("filtered");
   const [format, setFormat] = useState<"csv" | "xlsx">("csv");
@@ -91,7 +91,7 @@ export function QuoteExport({ filters, months, selectedIds, allMatching, total }
     } catch (e) { setError(e instanceof Error ? e.message : "Export could not be prepared."); }
     finally { setBusy(false); }
   }
-  return <Dialog open={open} onOpenChange={(v) => { setOpen(v); clearReady(); }}><DialogTrigger asChild><Button variant="outline"><Download className="size-4" />Export Quotes</Button></DialogTrigger><DialogContent className="max-h-[90dvh] overflow-y-auto"><DialogTitle>Export quote requests</DialogTitle><DialogDescription>{total} matching quotes · {selectionCount} selected</DialogDescription>
+  return <Dialog open={open} onOpenChange={(v) => { setOpen(v); clearReady(); }}><DialogTrigger asChild><Button variant="outline" className={triggerClassName}><Download className="size-4" />Export Quotes</Button></DialogTrigger><DialogContent className="max-h-[90dvh] overflow-y-auto"><DialogTitle>Export quote requests</DialogTitle><DialogDescription>{total} matching quotes · {selectionCount} selected</DialogDescription>
     <Select value={scope} onValueChange={(v) => { setScope(v); setDateFilters({}); clearReady(); }}><SelectTrigger aria-label="Export scope"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">All quotes</SelectItem><SelectItem value="filtered">Currently filtered quotes</SelectItem><SelectItem value="selected">Selected quotes</SelectItem><SelectItem value="months">Selected months</SelectItem><SelectItem value="range">Custom date range</SelectItem></SelectContent></Select>
     {(scope === "months" || scope === "range") && <DateFilters key={scope} initialMode={scope} value={dateFilters} availableMonths={months} onChange={(v) => { setDateFilters(v); clearReady(); }} />}
     <Select value={format} onValueChange={(v) => { setFormat(v as "csv" | "xlsx"); clearReady(); }}><SelectTrigger aria-label="Export format"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="csv">CSV</SelectItem><SelectItem value="xlsx">Excel (.xlsx)</SelectItem></SelectContent></Select>

@@ -145,24 +145,24 @@ function AdminQuotes() {
   return (
     <main className="min-h-screen bg-muted/40 px-4 py-10 sm:px-8">
       <div className="mx-auto max-w-6xl">
-        <header className="flex flex-wrap items-end justify-between gap-4">
-          <div>
+        <header className="grid min-w-0 gap-4">
+          <div className="min-w-0">
             <h1 className="text-2xl font-semibold text-foreground">Quote requests</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="mt-1 break-words text-sm text-muted-foreground">
               Signed in as {session.data?.email ?? "team member"} · {session.data?.roleLabel}
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-          <QuoteExport filters={filters} months={stats.data?.availableMonths ?? []} selectedIds={selected} allMatching={allMatching} total={quotes.data?.total ?? 0} />
-          <Button asChild variant="outline" className="h-11 rounded-xl"><Link to="/admin/customers">All Customers</Link></Button>
-          <Button asChild variant="outline" className="h-11 rounded-xl"><Link to="/admin/email">Bulk Email Campaigns</Link></Button>
-          <Button asChild variant="outline" className="h-11 rounded-xl"><Link to="/admin/performance">Marketing Performance</Link></Button>
-          {session.data?.canManageRoles && <Button asChild variant="outline" className="h-11 rounded-xl"><Link to="/admin/users">User roles</Link></Button>}
-          <Button variant="outline" onClick={signOut} className="h-11 rounded-xl">
+          <nav aria-label="Quote request actions" className="grid min-w-0 grid-cols-1 items-center gap-2 sm:flex sm:flex-wrap">
+          <QuoteExport filters={filters} months={stats.data?.availableMonths ?? []} selectedIds={selected} allMatching={allMatching} total={quotes.data?.total ?? 0} triggerClassName="h-11 shrink-0 rounded-xl" />
+          <Button asChild variant="outline" className="h-11 shrink-0 rounded-xl"><Link to="/admin/customers">All Customers</Link></Button>
+          <Button asChild variant="outline" className="h-11 shrink-0 rounded-xl"><Link to="/admin/email">Bulk Email Campaigns</Link></Button>
+          <Button asChild variant="outline" className="h-11 shrink-0 rounded-xl"><Link to="/admin/performance">Marketing Performance</Link></Button>
+          {session.data?.canManageRoles && <Button asChild variant="outline" className="h-11 shrink-0 rounded-xl"><Link to="/admin/users">User roles</Link></Button>}
+          <Button variant="outline" onClick={signOut} className="h-11 shrink-0 rounded-xl">
             <LogOut className="size-4" aria-hidden />
             Sign out
           </Button>
-          </div>
+          </nav>
         </header>
 
         <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
