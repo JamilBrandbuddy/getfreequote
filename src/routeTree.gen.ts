@@ -19,6 +19,8 @@ import { Route as AdminCustomersIndexRouteImport } from './routes/admin/customer
 import { Route as AdminCustomersCustomerIdRouteImport } from './routes/admin/customers/$customerId'
 import { Route as AdminEmailIndexRouteImport } from './routes/admin/email/index'
 import { Route as AdminEmailCampaignIdRouteImport } from './routes/admin/email/$campaignId'
+import { Route as AdminPerformanceIndexRouteImport } from './routes/admin/performance/index'
+import { Route as AdminPerformanceReportIdRouteImport } from './routes/admin/performance/$reportId'
 import { Route as AdminQuotesIndexRouteImport } from './routes/admin/quotes/index'
 import { Route as AdminQuotesIdRouteImport } from './routes/admin/quotes/$id'
 import { Route as ApiPublicQuoteSubmissionsRouteImport } from './routes/api/public/quote-submissions'
@@ -75,6 +77,17 @@ const AdminEmailCampaignIdRoute = AdminEmailCampaignIdRouteImport.update({
   path: '/admin/email/$campaignId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminPerformanceIndexRoute = AdminPerformanceIndexRouteImport.update({
+  id: '/admin/performance/',
+  path: '/admin/performance/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminPerformanceReportIdRoute =
+  AdminPerformanceReportIdRouteImport.update({
+    id: '/admin/performance/$reportId',
+    path: '/admin/performance/$reportId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminQuotesIndexRoute = AdminQuotesIndexRouteImport.update({
   id: '/admin/quotes/',
   path: '/admin/quotes/',
@@ -107,10 +120,12 @@ export interface FileRoutesByFullPath {
   '/unsubscribe/$token': typeof UnsubscribeTokenRoute
   '/admin/customers/$customerId': typeof AdminCustomersCustomerIdRoute
   '/admin/email/$campaignId': typeof AdminEmailCampaignIdRoute
+  '/admin/performance/$reportId': typeof AdminPerformanceReportIdRoute
   '/admin/quotes/$id': typeof AdminQuotesIdRoute
   '/api/public/quote-submissions': typeof ApiPublicQuoteSubmissionsRoute
   '/admin/customers/': typeof AdminCustomersIndexRoute
   '/admin/email/': typeof AdminEmailIndexRoute
+  '/admin/performance/': typeof AdminPerformanceIndexRoute
   '/admin/quotes/': typeof AdminQuotesIndexRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -123,10 +138,12 @@ export interface FileRoutesByTo {
   '/unsubscribe/$token': typeof UnsubscribeTokenRoute
   '/admin/customers/$customerId': typeof AdminCustomersCustomerIdRoute
   '/admin/email/$campaignId': typeof AdminEmailCampaignIdRoute
+  '/admin/performance/$reportId': typeof AdminPerformanceReportIdRoute
   '/admin/quotes/$id': typeof AdminQuotesIdRoute
   '/api/public/quote-submissions': typeof ApiPublicQuoteSubmissionsRoute
   '/admin/customers': typeof AdminCustomersIndexRoute
   '/admin/email': typeof AdminEmailIndexRoute
+  '/admin/performance': typeof AdminPerformanceIndexRoute
   '/admin/quotes': typeof AdminQuotesIndexRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -140,10 +157,12 @@ export interface FileRoutesById {
   '/unsubscribe/$token': typeof UnsubscribeTokenRoute
   '/admin/customers/$customerId': typeof AdminCustomersCustomerIdRoute
   '/admin/email/$campaignId': typeof AdminEmailCampaignIdRoute
+  '/admin/performance/$reportId': typeof AdminPerformanceReportIdRoute
   '/admin/quotes/$id': typeof AdminQuotesIdRoute
   '/api/public/quote-submissions': typeof ApiPublicQuoteSubmissionsRoute
   '/admin/customers/': typeof AdminCustomersIndexRoute
   '/admin/email/': typeof AdminEmailIndexRoute
+  '/admin/performance/': typeof AdminPerformanceIndexRoute
   '/admin/quotes/': typeof AdminQuotesIndexRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -158,10 +177,12 @@ export interface FileRouteTypes {
     | '/unsubscribe/$token'
     | '/admin/customers/$customerId'
     | '/admin/email/$campaignId'
+    | '/admin/performance/$reportId'
     | '/admin/quotes/$id'
     | '/api/public/quote-submissions'
     | '/admin/customers/'
     | '/admin/email/'
+    | '/admin/performance/'
     | '/admin/quotes/'
     | '/lovable/email/transactional/preview'
   fileRoutesByTo: FileRoutesByTo
@@ -174,10 +195,12 @@ export interface FileRouteTypes {
     | '/unsubscribe/$token'
     | '/admin/customers/$customerId'
     | '/admin/email/$campaignId'
+    | '/admin/performance/$reportId'
     | '/admin/quotes/$id'
     | '/api/public/quote-submissions'
     | '/admin/customers'
     | '/admin/email'
+    | '/admin/performance'
     | '/admin/quotes'
     | '/lovable/email/transactional/preview'
   id:
@@ -190,10 +213,12 @@ export interface FileRouteTypes {
     | '/unsubscribe/$token'
     | '/admin/customers/$customerId'
     | '/admin/email/$campaignId'
+    | '/admin/performance/$reportId'
     | '/admin/quotes/$id'
     | '/api/public/quote-submissions'
     | '/admin/customers/'
     | '/admin/email/'
+    | '/admin/performance/'
     | '/admin/quotes/'
     | '/lovable/email/transactional/preview'
   fileRoutesById: FileRoutesById
@@ -207,10 +232,12 @@ export interface RootRouteChildren {
   UnsubscribeTokenRoute: typeof UnsubscribeTokenRoute
   AdminCustomersCustomerIdRoute: typeof AdminCustomersCustomerIdRoute
   AdminEmailCampaignIdRoute: typeof AdminEmailCampaignIdRoute
+  AdminPerformanceReportIdRoute: typeof AdminPerformanceReportIdRoute
   AdminQuotesIdRoute: typeof AdminQuotesIdRoute
   ApiPublicQuoteSubmissionsRoute: typeof ApiPublicQuoteSubmissionsRoute
   AdminCustomersIndexRoute: typeof AdminCustomersIndexRoute
   AdminEmailIndexRoute: typeof AdminEmailIndexRoute
+  AdminPerformanceIndexRoute: typeof AdminPerformanceIndexRoute
   AdminQuotesIndexRoute: typeof AdminQuotesIndexRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
@@ -287,6 +314,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEmailCampaignIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/performance/': {
+      id: '/admin/performance/'
+      path: '/admin/performance'
+      fullPath: '/admin/performance/'
+      preLoaderRoute: typeof AdminPerformanceIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/performance/$reportId': {
+      id: '/admin/performance/$reportId'
+      path: '/admin/performance/$reportId'
+      fullPath: '/admin/performance/$reportId'
+      preLoaderRoute: typeof AdminPerformanceReportIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/quotes/': {
       id: '/admin/quotes/'
       path: '/admin/quotes'
@@ -327,10 +368,12 @@ const rootRouteChildren: RootRouteChildren = {
   UnsubscribeTokenRoute: UnsubscribeTokenRoute,
   AdminCustomersCustomerIdRoute: AdminCustomersCustomerIdRoute,
   AdminEmailCampaignIdRoute: AdminEmailCampaignIdRoute,
+  AdminPerformanceReportIdRoute: AdminPerformanceReportIdRoute,
   AdminQuotesIdRoute: AdminQuotesIdRoute,
   ApiPublicQuoteSubmissionsRoute: ApiPublicQuoteSubmissionsRoute,
   AdminCustomersIndexRoute: AdminCustomersIndexRoute,
   AdminEmailIndexRoute: AdminEmailIndexRoute,
+  AdminPerformanceIndexRoute: AdminPerformanceIndexRoute,
   AdminQuotesIndexRoute: AdminQuotesIndexRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }

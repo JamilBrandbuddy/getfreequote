@@ -17,3 +17,4 @@
 - Derive phone area-code regions from src/config/canadianAreaCodes.ts mirrored by SQL public.phone_region_code (never stored over phone fields); change both together via a new migration so dashboard filters and exports stay consistent.
 - Change quote conversion outcomes only through public.set_quote_conversion (a trigger blocks direct column writes) so every change is audited in quote_conversion_history; quote status only suggests outcomes.
 - Bulk email: send campaigns only via the separate marketing provider in campaigns.server.ts (MARKETING_RESEND_API_KEY), never the transactional app-email sender, so marketing cannot hurt quote-email deliverability; eligibility rules live in src/lib/email-campaign.ts.
+- Marketing reports: Marketing edits marketing_reports drafts; publishing goes only through public.publish_marketing_report, which snapshots immutable marketing_report_versions — Admin reads versions only, so drafts never reach the client view.

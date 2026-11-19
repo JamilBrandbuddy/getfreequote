@@ -354,6 +354,116 @@ export type Database = {
         }
         Relationships: []
       }
+      marketing_report_versions: {
+        Row: {
+          change_note: string | null
+          currency: string
+          data: Json
+          highlights: string
+          id: string
+          period_month: number
+          period_year: number
+          published_at: string
+          published_by: string | null
+          published_by_email: string | null
+          report_id: string
+          version: number
+        }
+        Insert: {
+          change_note?: string | null
+          currency: string
+          data: Json
+          highlights?: string
+          id?: string
+          period_month: number
+          period_year: number
+          published_at?: string
+          published_by?: string | null
+          published_by_email?: string | null
+          report_id: string
+          version: number
+        }
+        Update: {
+          change_note?: string | null
+          currency?: string
+          data?: Json
+          highlights?: string
+          id?: string
+          period_month?: number
+          period_year?: number
+          published_at?: string
+          published_by?: string | null
+          published_by_email?: string | null
+          report_id?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketing_report_versions_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      marketing_reports: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          created_by_email: string | null
+          currency: string
+          current_version: number
+          data: Json
+          has_unpublished_changes: boolean
+          highlights: string
+          id: string
+          period_month: number
+          period_year: number
+          published_at: string | null
+          status: string
+          updated_at: string
+          updated_by: string | null
+          updated_by_email: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          created_by_email?: string | null
+          currency?: string
+          current_version?: number
+          data?: Json
+          has_unpublished_changes?: boolean
+          highlights?: string
+          id?: string
+          period_month: number
+          period_year: number
+          published_at?: string | null
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+          updated_by_email?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          created_by_email?: string | null
+          currency?: string
+          current_version?: number
+          data?: Json
+          has_unpublished_changes?: boolean
+          highlights?: string
+          id?: string
+          period_month?: number
+          period_year?: number
+          published_at?: string | null
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+          updated_by_email?: string | null
+        }
+        Relationships: []
+      }
       quote_conversion_history: {
         Row: {
           changed_by: string | null
@@ -739,7 +849,15 @@ export type Database = {
       }
       is_operator: { Args: { _user_id: string }; Returns: boolean }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      marketing_quote_stats: {
+        Args: { _month: number; _year: number }
+        Returns: Json
+      }
       phone_region_code: { Args: { phone: string }; Returns: string }
+      publish_marketing_report: {
+        Args: { _note: string; _report_id: string }
+        Returns: Json
+      }
       quote_reporting: {
         Args: {
           filters?: Json
