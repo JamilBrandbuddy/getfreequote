@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { AlertTriangle, Inbox, Loader2, LogOut, Search, TrendingUp } from "lucide-react";
+import { CheckCircle2, Inbox, Percent, Loader2, LogOut, Search, TrendingUp } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -172,8 +172,8 @@ function AdminQuotes() {
         </header>
 
         <section className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <StatCard label="New requests" value={stats.data?.newCount} icon={<Inbox className="size-5" />} />
-          <StatCard label="Urgent" value={stats.data?.urgent} icon={<AlertTriangle className="size-5" />} />
+          <StatCard label="Total converted" value={stats.data?.conversion?.converted} icon={<CheckCircle2 className="size-5" />} />
+          <StatCard label="Conversion rate" value={stats.data?.conversion ? (stats.data.conversion.rate == null ? "—" : `${stats.data.conversion.rate}%`) : undefined} icon={<Percent className="size-5" />} />
           <StatCard label="Last 7 days" value={stats.data?.lastSevenDays} icon={<TrendingUp className="size-5" />} />
           <StatCard label="Total quotes" value={stats.data?.total} icon={<Inbox className="size-5" />} />
         </section>
@@ -286,7 +286,7 @@ function AdminQuotes() {
   );
 }
 
-function StatCard({ label, value, icon }: { label: string; value?: number; icon: React.ReactNode }) {
+function StatCard({ label, value, icon }: { label: string; value?: number | string; icon: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card px-4 py-3 shadow-soft">
       <span className="flex items-center gap-2 text-sm text-muted-foreground">
