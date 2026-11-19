@@ -49,7 +49,13 @@ export function DateFilters({ value, onChange, availableMonths, initialMode = "a
 export function AnalyticsView({ data }: { data?: QuoteAnalytics }) {
   if (!data) return null;
   const max = Math.max(1, ...data.trend.map((t) => t.count));
+  const c = data.conversion;
   return <section className="mt-6 space-y-5 border-y border-border py-5">
+    {c && <div><div className="flex flex-wrap items-baseline justify-between gap-2"><h2 className="text-lg font-semibold">Conversion</h2><span className="text-xs text-muted-foreground">Conversion rate = Converted ÷ Total valid quotes (spam excluded{c.excludedSpam ? `: ${c.excludedSpam}` : ""})</span></div>
+      <dl className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-5">{[["Total valid quotes", c.valid], ["Pending", c.pending], ["Converted", c.converted], ["Not Converted", c.notConverted], ["Conversion rate", c.rate == null ? "—" : `${c.rate}%`]].map(([k, v]) => <div key={String(k)} className="rounded-xl border border-border bg-card p-3"><dt className="text-xs text-muted-foreground">{k}</dt><dd className="mt-1 text-2xl font-semibold">{v}</dd></div>)}</dl>
+      {(c.suggestedConverted > 0 || c.suggestedNotConverted > 0) && <p className="mt-2 text-xs text-muted-foreground">Not yet confirmed: {c.suggestedConverted} pending quote(s) have status "completed" and {c.suggestedNotConverted} have status "lost". They count as Pending until someone confirms them.</p>}
+      <h3 className="mb-2 mt-4 text-sm font-medium">Monthly conversion trend</h3><ul className="space-y-1 text-xs">{data.trend.map((t) => <li key={t.month} className="grid grid-cols-[7rem_1fr_auto] gap-3"><span>{monthLabel(t.month)}</span><span className="text-muted-foreground">{t.converted ?? 0} converted of {t.valid ?? 0} valid</span><span className="font-semibold">{t.conversionRate == null ? "—" : `${t.conversionRate}%`}</span></li>)}</ul>
+    </div>}
     <div className="flex flex-wrap items-baseline justify-between gap-2"><h2 className="text-lg font-semibold">Monthly quote analytics</h2><span className="text-sm text-muted-foreground">{data.uniqueCustomers} unique customers · {data.total} submissions</span></div>
     {!data.total && <p className="text-sm text-muted-foreground">No quotes match these filters.</p>}
     <div className="grid gap-6 lg:grid-cols-[2fr_1fr_1fr_1fr]">

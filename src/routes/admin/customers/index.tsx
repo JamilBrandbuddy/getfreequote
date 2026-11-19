@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { getAdminSession } from "@/lib/admin.functions";
 import { listCustomers, exportCustomers } from "@/lib/customers.functions";
 import { RegionFilter, regionLabel } from "@/components/admin/QuoteReporting";
+import { SEGMENT_LABELS, type CustomerSegment } from "@/lib/conversion";
 import { decodeExport, deliverFile } from "@/lib/download-file";
 
 const STATUSES = ["new", "contacted", "awaiting-information", "estimating", "quote-sent", "appointment-requested", "booked", "completed", "lost", "spam"];
@@ -33,11 +34,11 @@ function CustomersPage() {
   const fetchList = useServerFn(listCustomers);
   const runExport = useServerFn(exportCustomers);
   const [search, setSearch] = useState(""); const [debounced, setDebounced] = useState("");
-  const [month, setMonth] = useState("all"); const [service, setService] = useState("all"); const [status, setStatus] = useState("all"); const [regions, setRegions] = useState<string[]>([]);
+  const [month, setMonth] = useState("all"); const [service, setService] = useState("all"); const [status, setStatus] = useState("all"); const [regions, setRegions] = useState<string[]>([]); const [segment, setSegment] = useState("all");
   const [page, setPage] = useState(0); const [selected, setSelected] = useState<string[]>([]);
   const [exporting, setExporting] = useState<string | null>(null); const [exportError, setExportError] = useState("");
   useEffect(() => { const t = setTimeout(() => setDebounced(search), 300); return () => clearTimeout(t); }, [search]);
-  const filters = { search: debounced.trim(), month, service, status, regions };
+  const filters = { search: debounced.trim(), month, service, status, regions, segment: segment as "all" };
   const key = JSON.stringify(filters);
   useEffect(() => { setPage(0); setSelected([]); }, [key]);
   const session = useQuery({ queryKey: ["admin-session"], queryFn: () => fetchSession({}), retry: false });
@@ -75,6 +76,7 @@ function CustomersPage() {
           <Filter label="Month" value={month} onChange={setMonth} options={d?.months ?? []} />
           <Filter label="Service" value={service} onChange={setService} options={d?.services ?? []} />
           <Filter label="Status" value={status} onChange={setStatus} options={STATUSES} />
+          <Select value={segment} onValueChange={setSegment}><SelectTrigger className="h-11 w-full rounded-xl sm:w-64" aria-label="Conversion segment"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">All conversion segments</SelectItem>{(Object.keys(SEGMENT_LABELS) as CustomerSegment[]).map((k) => <SelectItem key={k} value={k}>{SEGMENT_LABELS[k]}</SelectItem>)}</SelectContent></Select>
           <RegionFilter value={regions} onChange={setRegions} />
         </section>
         <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
@@ -85,6 +87,7 @@ function CustomersPage() {
             </Button>)))}
           {exportError && <span role="alert" className="text-destructive">{exportError}</span>}
         </div>
+        <p className="mt-3 text-xs text-muted-foreground">Conversion segments are recipient filters only. They do not give permission to send promotional email.</p>
         {list.isError && <p role="alert" className="mt-4 text-sm text-destructive">Could not load customers.</p>}
         <div className="mt-4 overflow-x-auto rounded-2xl border border-border bg-card shadow-sm">
           <table className="w-full min-w-[860px] text-sm">
@@ -92,12 +95,12 @@ function CustomersPage() {
               <tr>
                 <th className="p-3"><Checkbox aria-label="Select this page" checked={!!pageIds.length && pageIds.every((id) => selected.includes(id))} onCheckedChange={(c) => setSelected((s) => c ? [...new Set([...s, ...pageIds])] : s.filter((id) => !pageIds.includes(id)))} /></th>
                 <th className="p-3">#</th><th className="p-3">Customer</th><th className="p-3">Phone</th><th className="p-3">Email</th>
-                <th className="p-3">Latest quote</th><th className="p-3">Latest service</th><th className="p-3">Quotes</th><th className="p-3">Status</th><th className="p-3">Service location</th><th className="p-3">Phone region</th>
+                <th className="p-3">Latest quote</th><th className="p-3">Latest service</th><th className="p-3">Quotes</th><th className="p-3">Status</th><th className="p-3">Conversion</th><th className="p-3">Service location</th><th className="p-3">Phone region</th>
               </tr>
             </thead>
             <tbody>
-              {list.isPending && <tr><td colSpan={11} className="p-8 text-center"><Loader2 className="mx-auto size-6 animate-spin text-muted-foreground" /></td></tr>}
-              {d && !d.rows.length && <tr><td colSpan={11} className="p-10 text-center text-muted-foreground"><Users className="mx-auto mb-2 size-6" />No customers match these filters.</td></tr>}
+              {list.isPending && <tr><td colSpan={12} className="p-8 text-center"><Loader2 className="mx-auto size-6 animate-spin text-muted-foreground" /></td></tr>}
+              {d && !d.rows.length && <tr><td colSpan={12} className="p-10 text-center text-muted-foreground"><Users className="mx-auto mb-2 size-6" />No customers match these filters.</td></tr>}
               {d?.rows.map((c, i) => (
                 <tr key={c.id} className="border-t border-border hover:bg-muted/40">
                   <td className="p-3"><Checkbox aria-label={`Select ${c.name}`} checked={selected.includes(c.id)} onCheckedChange={(v) => setSelected((s) => v ? [...s, c.id] : s.filter((x) => x !== c.id))} /></td>
@@ -106,13 +109,13 @@ function CustomersPage() {
                   <td className="p-3">{c.phones[0] ?? "—"}</td><td className="p-3">{c.emails[0] ?? "—"}</td>
                   <td className="p-3">{new Date(c.latestQuoteAt).toLocaleDateString("en-CA", { timeZone: "America/Regina" })}</td>
                   <td className="p-3">{c.latestService ?? "—"}</td><td className="p-3">{c.quoteCount}</td>
-                  <td className="p-3 capitalize">{c.latestStatus.replace(/-/g, " ")}</td><td className="p-3">{c.serviceLocation ?? "—"}{c.serviceProvince ? `, ${c.serviceProvince}` : ""}</td><td className="p-3">{regionLabel(c.phoneRegion)}</td>
+                  <td className="p-3 capitalize">{c.latestStatus.replace(/-/g, " ")}</td><td className="p-3">{SEGMENT_LABELS[c.segment].replace(" Customers", "")}{c.quoteCount > 1 && <span className="block text-xs text-muted-foreground">{c.convertedQuotes} conv · {c.notConvertedQuotes} not · {c.pendingQuotes} pending</span>}</td><td className="p-3">{c.serviceLocation ?? "—"}{c.serviceProvince ? `, ${c.serviceProvince}` : ""}</td><td className="p-3">{regionLabel(c.phoneRegion)}</td>
                 </tr>))}
             </tbody>
           </table>
         </div>
         <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
-          <span>Page {page + 1} of {pages} · {d?.total ?? 0} customers · {d?.matchedQuotes ?? 0} quotes</span>
+          <span>Page {page + 1} of {pages} · {d?.total ?? 0} customers · {d?.matchedQuotes ?? 0} quotes{d?.segments ? ` · Unique customers: ${d.segments.converted} converted, ${d.segments.not_converted} not converted, ${d.segments.pending} pending` : ""}</span>
           <div className="flex gap-2">
             <Button variant="outline" disabled={page === 0} onClick={() => setPage((p) => p - 1)}>Previous</Button>
             <Button variant="outline" disabled={page + 1 >= pages} onClick={() => setPage((p) => p + 1)}>Next</Button>

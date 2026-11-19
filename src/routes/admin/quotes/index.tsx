@@ -19,6 +19,7 @@ import { getQuoteAnalytics } from "@/lib/quote-reports.functions";
 import type { ReportingFilters } from "@/lib/quote-reporting";
 import { DateFilters, AnalyticsView, QuoteExport, RegionFilter, regionLabel } from "@/components/admin/QuoteReporting";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ConversionBadge, ConversionControl } from "@/components/admin/ConversionControl";
 
 const STATUSES = [
   "new",
@@ -73,11 +74,12 @@ function AdminQuotes() {
   const [page, setPage] = useState(0);
   const [period, setPeriod] = useState<ReportingFilters>({});
   const [service, setService] = useState("all");
+  const [conversion, setConversion] = useState<"all" | "pending" | "converted" | "not_converted">("all");
   const [regions, setRegions] = useState<string[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
   const [allMatching, setAllMatching] = useState(false);
   const [resetKey, setResetKey] = useState(0);
-  const filters = { ...period, search: debounced.trim(), status, priority, service, sort, regions };
+  const filters = { ...period, search: debounced.trim(), status, priority, service, conversion, sort, regions };
   const filterKey = JSON.stringify(filters);
   useEffect(() => { setSelected([]); setAllMatching(false); setPage(0); }, [filterKey]);
 
@@ -192,8 +194,9 @@ function AdminQuotes() {
         </div>
         <div className="mt-3 flex flex-wrap gap-3">
           <FilterSelect label="Service" value={service} onChange={setService} options={stats.data?.services ?? []} />
+          <FilterSelect label="Conversion" value={conversion} onChange={(v) => setConversion(v as typeof conversion)} options={["pending", "converted", "not_converted"]} />
           <RegionFilter value={regions} onChange={setRegions} />
-          <Button variant="ghost" onClick={() => { setSearch(""); setDebounced(""); setStatus("all"); setPriority("all"); setService("all"); setRegions([]); setSort("newest"); setPeriod({}); setResetKey((k) => k + 1); }}>Reset filters</Button>
+          <Button variant="ghost" onClick={() => { setSearch(""); setDebounced(""); setStatus("all"); setPriority("all"); setService("all"); setConversion("all"); setRegions([]); setSort("newest"); setPeriod({}); setResetKey((k) => k + 1); }}>Reset filters</Button>
         </div>
         <DateFilters key={resetKey} value={period} availableMonths={stats.data?.availableMonths ?? []} onChange={setPeriod} />
         </section>
@@ -214,7 +217,7 @@ function AdminQuotes() {
           ) : (
             <ul className="divide-y divide-border">
               {quotes.data?.rows.map((q) => (
-                <li key={q.id} className="flex items-center pl-4">
+                <li key={q.id} className="flex flex-wrap items-center pl-4">
                   <Checkbox aria-label={`Select ${q.public_reference}`} disabled={allMatching} checked={allMatching || selected.includes(q.id)} onCheckedChange={(checked) => setSelected((s) => checked ? [...new Set([...s, q.id])] : s.filter((id) => id !== q.id))} />
                   <Link
                     to="/admin/quotes/$id"
@@ -240,10 +243,12 @@ function AdminQuotes() {
                     <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold capitalize text-secondary-foreground">
                       {q.status.replace(/-/g, " ")}
                     </span>
+                    <ConversionBadge value={q.conversion_status} status={q.status} />
                     <span className="text-xs text-muted-foreground">
                       {new Date(q.created_at).toLocaleDateString("en-CA", { timeZone: "America/Regina" })}
                     </span>
                   </Link>
+                  <div className="pr-4"><ConversionControl compact quoteId={q.id} reference={q.public_reference} value={q.conversion_status ?? "pending"} /></div>
                 </li>
               ))}
             </ul>
@@ -307,7 +312,7 @@ function FilterSelect({
         {includeAll && <SelectItem value="all">All {label.toLowerCase()}</SelectItem>}
         {options.map((option) => (
           <SelectItem key={option} value={option} className="capitalize">
-            {option.replace(/-/g, " ")}
+            {option.replace(/[-_]/g, " ")}
           </SelectItem>
         ))}
       </SelectContent>

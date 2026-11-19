@@ -13,6 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { deleteQuote, getQuote, updateQuote } from "@/lib/admin.functions";
+import { ConversionBadge, ConversionControl } from "@/components/admin/ConversionControl";
+import { conversionLabel } from "@/lib/conversion";
 
 const STATUSES = [
   "new", "contacted", "awaiting-information", "estimating", "quote-sent",
@@ -161,6 +163,21 @@ function QuoteDetail() {
         {deleteError && (
           <p className="mt-4 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">{deleteError}</p>
         )}
+
+        <section className="mt-5 rounded-2xl border border-border bg-card p-5 shadow-soft" aria-label="Conversion outcome">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-3"><h2 className="text-base font-semibold">Conversion outcome</h2><ConversionBadge value={String(quote["conversion_status"] ?? "pending")} status={String(quote["status"])} /></div>
+            <ConversionControl quoteId={id} reference={String(quote["public_reference"])} value={String(quote["conversion_status"] ?? "pending")} />
+          </div>
+          <ul className="mt-4 space-y-2 text-sm">
+            {(detail.data?.conversionHistory ?? []).length === 0 && <li className="text-muted-foreground">No conversion changes yet. A "completed" or "lost" quote status is only a suggestion until confirmed here.</li>}
+            {detail.data?.conversionHistory.map((h) => <li key={h.id} className="border-l-2 border-border pl-3">
+              <span className="font-medium">{conversionLabel(h.previous_status)} → {conversionLabel(h.new_status)}</span>
+              <span className="block text-xs text-muted-foreground">{new Date(h.created_at).toLocaleString("en-CA", { timeZone: "America/Regina" })} · {h.changed_by_email ?? "team member"}</span>
+              {h.note && <span className="block text-muted-foreground">{h.note}</span>}
+            </li>)}
+          </ul>
+        </section>
 
         {Boolean(quote["adas_required_review"]) && (
           <p className="mt-5 rounded-2xl border border-accent/40 bg-accent/10 px-5 py-4 text-sm text-foreground">

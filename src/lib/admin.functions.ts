@@ -2,7 +2,9 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
+import { z } from "zod";
 import { permissionsFor } from "./permissions";
+import { CONVERSION_STATUSES } from "./conversion";
 import { reportingFiltersSchema, type ReportingFilters } from "./quote-reporting";
 
 type QuoteStatus = Database["public"]["Enums"]["quote_status"];
@@ -15,6 +17,7 @@ export interface AdminQuoteListItem {
   created_at: string;
   status: string;
   priority: string;
+  conversion_status: string;
   customer_name: string;
   phone_region?: string;
   customer_phone: string;
@@ -133,7 +136,13 @@ export const getQuote = createServerFn({ method: "POST" })
       .eq("quote_id", data.id)
       .order("created_at", { ascending: false });
 
-    return { quote, files: signedFiles, history: history ?? [] };
+    const { data: conversionHistory } = await context.supabase
+      .from("quote_conversion_history")
+      .select("id, previous_status, new_status, note, changed_by_email, created_at")
+      .eq("quote_id", data.id)
+      .order("created_at", { ascending: false });
+
+    return { quote, files: signedFiles, history: history ?? [], conversionHistory: conversionHistory ?? [] };
   });
 
 export const updateQuote = createServerFn({ method: "POST" })
@@ -181,4 +190,16 @@ export const deleteQuote = createServerFn({ method: "POST" })
     const { error } = await supabaseAdmin.from("quotes").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
+  });
+
+/** Audited conversion outcome change; the database function records who/when/previous/note atomically. */
+export const setQuoteConversion = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({ id: z.string().uuid(), status: z.enum(CONVERSION_STATUSES), note: z.string().max(1000).optional() }))
+  .handler(async ({ data, context }) => {
+    const { data: permitted, error: accessError } = await context.supabase.rpc("is_operator", { _user_id: context.userId });
+    if (accessError || !permitted) throw new Error("Dashboard access required.");
+    const { data: result, error } = await context.supabase.rpc("set_quote_conversion", { _quote_id: data.id, _new_status: data.status, _note: data.note ?? "" });
+    if (error) throw new Error("Could not update the conversion outcome.");
+    return result as { changed: boolean; status: string };
   });

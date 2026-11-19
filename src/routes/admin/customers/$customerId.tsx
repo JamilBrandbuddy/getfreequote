@@ -1,3 +1,4 @@
+import { conversionLabel } from "@/lib/conversion";
 import { useEffect } from "react";
 import { regionLabel } from "@/components/admin/QuoteReporting";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -61,6 +62,7 @@ function CustomerPage() {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <Link to="/admin/quotes/$id" params={{ id: quote.id }} className="font-medium text-primary hover:underline">{quote.public_reference}</Link>
                 <span className="rounded-full bg-muted px-3 py-1 text-xs capitalize">{quote.status.replace(/-/g, " ")}</span>
+                <span className="rounded-full bg-secondary px-3 py-1 text-xs">{conversionLabel(quote.conversion_status)}</span>
               </div>
               <p className="mt-2 text-sm text-muted-foreground">{fmt(quote.created_at)} · Requested: {quote.requested_service ?? quote.glass_area ?? "—"}</p>
               <p className="text-sm text-muted-foreground">Vehicle: {[quote.vehicle_year, quote.vehicle_make, quote.vehicle_model].filter(Boolean).join(" ") || "—"}</p>

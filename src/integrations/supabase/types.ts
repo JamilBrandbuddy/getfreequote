@@ -14,6 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      quote_conversion_history: {
+        Row: {
+          changed_by: string | null
+          changed_by_email: string | null
+          created_at: string
+          id: string
+          new_status: string
+          note: string | null
+          previous_status: string | null
+          quote_id: string
+        }
+        Insert: {
+          changed_by?: string | null
+          changed_by_email?: string | null
+          created_at?: string
+          id?: string
+          new_status: string
+          note?: string | null
+          previous_status?: string | null
+          quote_id: string
+        }
+        Update: {
+          changed_by?: string | null
+          changed_by_email?: string | null
+          created_at?: string
+          id?: string
+          new_status?: string
+          note?: string | null
+          previous_status?: string | null
+          quote_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_conversion_history_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quote_files: {
         Row: {
           created_at: string
@@ -117,6 +158,9 @@ export type Database = {
           assigned_to: string | null
           best_contact_time: string | null
           contact_consent: boolean
+          conversion_changed_at: string | null
+          conversion_changed_by: string | null
+          conversion_status: string
           created_at: string
           customer_email: string | null
           customer_name: string
@@ -164,6 +208,9 @@ export type Database = {
           assigned_to?: string | null
           best_contact_time?: string | null
           contact_consent?: boolean
+          conversion_changed_at?: string | null
+          conversion_changed_by?: string | null
+          conversion_status?: string
           created_at?: string
           customer_email?: string | null
           customer_name: string
@@ -211,6 +258,9 @@ export type Database = {
           assigned_to?: string | null
           best_contact_time?: string | null
           contact_consent?: boolean
+          conversion_changed_at?: string | null
+          conversion_changed_by?: string | null
+          conversion_status?: string
           created_at?: string
           customer_email?: string | null
           customer_name?: string
@@ -288,6 +338,9 @@ export type Database = {
           assigned_to: string | null
           best_contact_time: string | null
           contact_consent: boolean
+          conversion_changed_at: string | null
+          conversion_changed_by: string | null
+          conversion_status: string
           created_at: string
           customer_email: string | null
           customer_name: string
@@ -355,6 +408,10 @@ export type Database = {
           row_offset?: number
           selected_ids?: string[]
         }
+        Returns: Json
+      }
+      set_quote_conversion: {
+        Args: { _new_status: string; _note?: string; _quote_id: string }
         Returns: Json
       }
     }
