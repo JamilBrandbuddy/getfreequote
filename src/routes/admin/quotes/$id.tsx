@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { classifyPhone } from "@/config/canadianAreaCodes";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -171,6 +172,7 @@ function QuoteDetail() {
           <Panel title="Customer">
             <Row k="Name" v={quote["customer_name"]} />
             <Row k="Phone" v={quote["customer_phone"]} />
+            <Row k="Phone area code region" v={classifyPhone(String(quote["customer_phone"] ?? "")).label} />
             <Row k="Email" v={quote["customer_email"]} />
             <Row k="Preferred contact" v={quote["preferred_contact_method"]} />
             <Row k="Notes from customer" v={quote["customer_notes"]} />
@@ -202,6 +204,7 @@ function QuoteDetail() {
             ))}
             <Row k="Location type" v={quote["service_location_type"]} />
             <Row k="Address" v={[address["streetAddress"], address["city"], address["postalCode"]].filter(Boolean).join(", ")} />
+            <Row k="Service province (customer-entered)" v={String(address["province"] ?? "") || "Not provided"} />
             <Row k="Urgency" v={quote["preferred_urgency"]} />
             <Row k="Preferred date" v={`${label(quote["preferred_date"])} ${label(quote["preferred_time"])}`} />
           </Panel>

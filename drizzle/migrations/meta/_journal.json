@@ -15,6 +15,13 @@
       "when": 1795027118398,
       "tag": "0001_quote_monthly_reporting",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795054716349,
+      "tag": "0002_phone_area_region_classification",
+      "breakpoints": true
     }
   ]
 }

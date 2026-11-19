@@ -346,6 +346,7 @@ export type Database = {
       }
       is_operator: { Args: { _user_id: string }; Returns: boolean }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      phone_region_code: { Args: { phone: string }; Returns: string }
       quote_reporting: {
         Args: {
           filters?: Json

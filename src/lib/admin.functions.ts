@@ -16,6 +16,7 @@ export interface AdminQuoteListItem {
   status: string;
   priority: string;
   customer_name: string;
+  phone_region?: string;
   customer_phone: string;
   customer_email: string | null;
   glass_area: string | null;

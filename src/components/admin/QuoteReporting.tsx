@@ -8,8 +8,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { prepareQuoteExport } from "@/lib/quote-reports.functions";
 import { decodeExport, deliverFile } from "@/lib/download-file";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { REGION_CODES, REGION_LABELS } from "@/config/canadianAreaCodes";
 import type { QuoteAnalytics, ReportingFilters } from "@/lib/quote-reporting";
 
+export function regionLabel(code?: string | null) { return (code && REGION_LABELS[code]) || "Unknown"; }
+export function RegionFilter({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
+  const label = !value.length ? "All regions" : value.length === 1 ? regionLabel(value[0]) : `${value.length} regions`;
+  return <Popover><PopoverTrigger asChild><Button variant="outline" className="h-11 min-w-[10rem] justify-between rounded-xl" aria-label="Phone area code region">{label}</Button></PopoverTrigger>
+    <PopoverContent className="w-72 p-3" align="start">
+      <p className="mb-2 text-xs text-muted-foreground">Phone area code region (not proof of where the customer lives)</p>
+      <div className="max-h-80 space-y-2 overflow-y-auto">{REGION_CODES.map((c) => <label key={c} className="flex items-center gap-2 text-sm"><Checkbox aria-label={REGION_LABELS[c]} checked={value.includes(c)} onCheckedChange={(on) => onChange(on ? [...value, c] : value.filter((x) => x !== c))} />{REGION_LABELS[c]}</label>)}</div>
+      {value.length > 0 && <Button variant="ghost" size="sm" className="mt-2" onClick={() => onChange([])}>All regions</Button>}
+    </PopoverContent></Popover>;
+}
 export function monthLabel(month: string) {
   return new Date(`${month}-01T12:00:00Z`).toLocaleDateString("en-CA", { month: "long", year: "numeric", timeZone: "America/Regina" });
 }
@@ -40,10 +52,11 @@ export function AnalyticsView({ data }: { data?: QuoteAnalytics }) {
   return <section className="mt-6 space-y-5 border-y border-border py-5">
     <div className="flex flex-wrap items-baseline justify-between gap-2"><h2 className="text-lg font-semibold">Monthly quote analytics</h2><span className="text-sm text-muted-foreground">{data.uniqueCustomers} unique customers · {data.total} submissions</span></div>
     {!data.total && <p className="text-sm text-muted-foreground">No quotes match these filters.</p>}
-    <div className="grid gap-6 lg:grid-cols-[2fr_1fr_1fr]">
+    <div className="grid gap-6 lg:grid-cols-[2fr_1fr_1fr_1fr]">
       <div><h3 className="mb-3 text-sm font-medium">Monthly quote trend</h3><div className="space-y-3">{data.trend.map((t) => <div key={t.month} className="grid grid-cols-[7rem_1fr_3rem] items-center gap-3 text-xs"><span>{monthLabel(t.month)}<span className="block text-muted-foreground">{t.change == null ? "MoM: N/A" : `MoM: ${t.change > 0 ? "+" : ""}${t.change}%`}</span></span><meter aria-label={`${monthLabel(t.month)} quotes`} min={0} max={max} value={t.count} className="h-5 w-full accent-primary" /><span className="text-right font-semibold">{t.count}</span></div>)}</div></div>
       <Breakdown title="Quote status" rows={data.statuses} />
       <Breakdown title="Requested service" rows={data.serviceBreakdown} />
+      <div><h3 className="mb-3 text-sm font-medium">Phone area region</h3><ul className="space-y-2 text-sm">{(data.regionBreakdown ?? []).map((r) => <li key={r.label} className="flex justify-between gap-3"><span className="text-muted-foreground">{regionLabel(r.label)}</span><span className="text-right font-semibold">{r.count}<span className="block text-xs font-normal text-muted-foreground">{r.customers} customers</span></span></li>)}</ul></div>
     </div>
   </section>;
 }

@@ -17,7 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getAdminSession, listQuotes } from "@/lib/admin.functions";
 import { getQuoteAnalytics } from "@/lib/quote-reports.functions";
 import type { ReportingFilters } from "@/lib/quote-reporting";
-import { DateFilters, AnalyticsView, QuoteExport } from "@/components/admin/QuoteReporting";
+import { DateFilters, AnalyticsView, QuoteExport, RegionFilter, regionLabel } from "@/components/admin/QuoteReporting";
 import { Checkbox } from "@/components/ui/checkbox";
 
 const STATUSES = [
@@ -73,10 +73,11 @@ function AdminQuotes() {
   const [page, setPage] = useState(0);
   const [period, setPeriod] = useState<ReportingFilters>({});
   const [service, setService] = useState("all");
+  const [regions, setRegions] = useState<string[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
   const [allMatching, setAllMatching] = useState(false);
   const [resetKey, setResetKey] = useState(0);
-  const filters = { ...period, search: debounced.trim(), status, priority, service, sort };
+  const filters = { ...period, search: debounced.trim(), status, priority, service, sort, regions };
   const filterKey = JSON.stringify(filters);
   useEffect(() => { setSelected([]); setAllMatching(false); setPage(0); }, [filterKey]);
 
@@ -191,7 +192,8 @@ function AdminQuotes() {
         </div>
         <div className="mt-3 flex flex-wrap gap-3">
           <FilterSelect label="Service" value={service} onChange={setService} options={stats.data?.services ?? []} />
-          <Button variant="ghost" onClick={() => { setSearch(""); setDebounced(""); setStatus("all"); setPriority("all"); setService("all"); setSort("newest"); setPeriod({}); setResetKey((k) => k + 1); }}>Reset filters</Button>
+          <RegionFilter value={regions} onChange={setRegions} />
+          <Button variant="ghost" onClick={() => { setSearch(""); setDebounced(""); setStatus("all"); setPriority("all"); setService("all"); setRegions([]); setSort("newest"); setPeriod({}); setResetKey((k) => k + 1); }}>Reset filters</Button>
         </div>
         <DateFilters key={resetKey} value={period} availableMonths={stats.data?.availableMonths ?? []} onChange={setPeriod} />
         </section>
@@ -228,6 +230,7 @@ function AdminQuotes() {
                         {[q.vehicle_year, q.vehicle_make, q.vehicle_model].filter(Boolean).join(" ") || "Vehicle TBC"}
                       </span>
                     </span>
+                    <span className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground" title="Phone area code region">{regionLabel(q.phone_region)}</span>
                     <span className="text-xs capitalize text-muted-foreground">
                       {(q.requested_service ?? "—").replace(/_/g, " ")}
                     </span>

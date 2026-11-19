@@ -1,17 +1,18 @@
 // Derived customer directory: groups quote rows into likely customers without
 // changing any stored contact value. Phone is the primary identity; email only
+import { classifyPhone } from "@/config/canadianAreaCodes";
 // joins when it points to exactly one phone identity (otherwise flagged ambiguous).
 export interface CustomerQuoteRow {
   id: string; public_reference: string; created_at: string; status: string;
   requested_service: string | null; glass_area: string | null;
   customer_name: string; customer_phone: string; customer_email: string | null;
   vehicle_year: string | null; vehicle_make: string | null; vehicle_model: string | null;
-  service_city: string | null;
+  service_city: string | null; service_province?: string | null;
 }
 export interface CustomerProfile {
   key: string; name: string; phones: string[]; emails: string[];
   quoteCount: number; firstQuoteAt: string; latestQuoteAt: string;
-  latestService: string | null; latestStatus: string; serviceLocation: string | null;
+  latestService: string | null; latestStatus: string; serviceLocation: string | null; serviceProvince: string | null; phoneRegion: string;
   ambiguous: boolean; quoteIds: string[];
 }
 
@@ -58,12 +59,14 @@ export function groupCustomers(rows: CustomerQuoteRow[]): CustomerProfile[] {
       firstQuoteAt: sorted[sorted.length - 1].created_at, latestQuoteAt: latest.created_at,
       latestService: latest.requested_service ?? latest.glass_area, latestStatus: latest.status,
       serviceLocation: sorted.find((r) => r.service_city)?.service_city ?? null,
+      serviceProvince: sorted.find((r) => r.service_province)?.service_province ?? null,
+      phoneRegion: classifyPhone(sorted.find((r) => normalizePhone(r.customer_phone))?.customer_phone ?? sorted[0].customer_phone).code,
       ambiguous: ambiguousKeys.has(key), quoteIds: sorted.map((r) => r.id),
     };
   }).sort((a, b) => b.latestQuoteAt.localeCompare(a.latestQuoteAt));
 }
 
-export interface CustomerFilters { search?: string; month?: string; service?: string; status?: string }
+export interface CustomerFilters { search?: string; month?: string; service?: string; status?: string; regions?: string[] }
 export function filterCustomers(list: CustomerProfile[], rows: CustomerQuoteRow[], f: CustomerFilters) {
   const byId = new Map(rows.map((r) => [r.id, r]));
   const q = (f.search ?? "").trim().toLowerCase(), qd = q.replace(/\D/g, "");
@@ -71,6 +74,7 @@ export function filterCustomers(list: CustomerProfile[], rows: CustomerQuoteRow[
     if (q && !(c.name.toLowerCase().includes(q) || c.emails.some((e) => e.includes(q)) ||
       (qd.length >= 3 && c.phones.some((p) => p.replace(/\D/g, "").includes(qd))))) return false;
     if (f.status && f.status !== "all" && c.latestStatus !== f.status) return false;
+    if (f.regions?.length && !f.regions.includes(c.phoneRegion)) return false;
     const quotes = c.quoteIds.map((id) => byId.get(id)!);
     if (f.month && f.month !== "all" && !quotes.some((r) => r.created_at.slice(0, 7) === f.month)) return false;
     if (f.service && f.service !== "all" && !quotes.some((r) => (r.requested_service ?? r.glass_area) === f.service)) return false;

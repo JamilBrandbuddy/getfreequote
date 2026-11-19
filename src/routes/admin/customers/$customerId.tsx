@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { regionLabel } from "@/components/admin/QuoteReporting";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -46,7 +47,8 @@ function CustomerPage() {
             <Item label="Phone">{p.phones.join(", ") || "—"}</Item>
             <Item label="Email">{p.emails.join(", ") || "—"}</Item>
             <Item label="Total quote submissions">{p.quoteCount}</Item>
-            <Item label="Service location">{p.serviceLocation ?? "—"}</Item>
+            <Item label="Service location (customer-entered)">{[p.serviceLocation, p.serviceProvince].filter(Boolean).join(", ") || "Not provided"}</Item>
+            <Item label="Phone area code region">{regionLabel(p.phoneRegion)}</Item>
             <Item label="First quote">{fmt(p.firstQuoteAt)}</Item>
             <Item label="Latest quote">{fmt(p.latestQuoteAt)}</Item>
           </dl>
