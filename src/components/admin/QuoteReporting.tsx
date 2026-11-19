@@ -15,7 +15,7 @@ import type { QuoteAnalytics, ReportingFilters } from "@/lib/quote-reporting";
 export function regionLabel(code?: string | null) { return (code && REGION_LABELS[code]) || "Unknown"; }
 export function RegionFilter({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
   const label = !value.length ? "All regions" : value.length === 1 ? regionLabel(value[0]) : `${value.length} regions`;
-  return <Popover><PopoverTrigger asChild><Button variant="outline" className="h-11 min-w-[10rem] justify-between rounded-xl" aria-label="Phone area code region">{label}</Button></PopoverTrigger>
+  return <Popover><PopoverTrigger asChild><Button variant="outline" className="h-11 w-[calc(50%-0.375rem)] sm:w-40 justify-between rounded-xl" aria-label="Phone area code region">{label}</Button></PopoverTrigger>
     <PopoverContent className="w-72 p-3" align="start">
       <p className="mb-2 text-xs text-muted-foreground">Phone area code region (not proof of where the customer lives)</p>
       <div className="max-h-80 space-y-2 overflow-y-auto">{REGION_CODES.map((c) => <label key={c} className="flex items-center gap-2 text-sm"><Checkbox aria-label={REGION_LABELS[c]} checked={value.includes(c)} onCheckedChange={(on) => onChange(on ? [...value, c] : value.filter((x) => x !== c))} />{REGION_LABELS[c]}</label>)}</div>
@@ -31,10 +31,10 @@ export function DateFilters({ value, onChange, availableMonths, initialMode = "a
   const months = value.months ?? [];
   function changeMode(mode: string) { setMode(mode); onChange({ ...value, months: [], startDate: undefined, endDate: undefined }); }
   function toggle(month: string) { onChange({ ...value, months: months.includes(month) ? months.filter((m) => m !== month) : [...months, month].sort() }); }
-  return <div className={inline ? "space-y-3" : "mt-4 space-y-3 border-t border-border pt-4"}>
+  return <div className={inline ? "w-[calc(50%-0.375rem)] space-y-3 sm:w-auto" : "mt-4 space-y-3 border-t border-border pt-4"}>
     <div className="flex flex-wrap items-center gap-3">
       {!inline && <span className="text-sm font-medium">Submission period</span>}
-      <Select value={mode} onValueChange={changeMode}><SelectTrigger aria-label="Submission period" className={inline ? "h-11 w-44 rounded-xl" : "w-full sm:w-52"}><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">{inline ? "All periods" : "All months"}</SelectItem><SelectItem value="months">Selected months</SelectItem><SelectItem value="range">Custom date range</SelectItem></SelectContent></Select>
+      <Select value={mode} onValueChange={changeMode}><SelectTrigger aria-label="Submission period" className={inline ? "h-11 w-full sm:w-40 rounded-xl" : "w-full sm:w-52"}><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">{inline ? "All periods" : "All months"}</SelectItem><SelectItem value="months">Selected months</SelectItem><SelectItem value="range">Custom date range</SelectItem></SelectContent></Select>
       {!inline && <span className="text-xs text-muted-foreground">America/Regina</span>}
     </div>
     {mode === "months" && <>

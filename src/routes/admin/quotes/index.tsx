@@ -180,12 +180,12 @@ function AdminQuotes() {
 
         <section className="mt-6 border-y border-border py-4">
         <div className="flex flex-wrap items-start gap-3">
-          <div className="relative min-w-[14rem] flex-1 basis-60 xl:max-w-xs">
+          <div className="relative min-w-[12rem] flex-1 basis-48">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search reference, name, phone…"
+              placeholder="Search name, phone, ref…"
               aria-label="Search quotes"
               className="h-11 rounded-xl pl-9"
             />
@@ -305,7 +305,7 @@ function FilterSelect({
 }) {
   return (
     <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className="h-11 min-w-[10rem] rounded-xl" aria-label={label}>
+      <SelectTrigger className="h-11 w-[calc(50%-0.375rem)] sm:w-40 rounded-xl" aria-label={label}>
         <SelectValue placeholder={label} />
       </SelectTrigger>
       <SelectContent>
