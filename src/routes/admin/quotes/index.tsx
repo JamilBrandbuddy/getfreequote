@@ -103,6 +103,12 @@ function AdminQuotes() {
     enabled: session.data?.canOperate === true,
   });
 
+  const sgiStats = useQuery({
+    queryKey: ["admin-stats-sgi", filterKey],
+    queryFn: () => fetchStats({ data: { ...filters, insurance: "sgi_any" } }),
+    enabled: session.data?.canOperate === true,
+  });
+
   const quotes = useQuery({
     queryKey: ["admin-quotes", filterKey, page],
     queryFn: () => fetchQuotes({ data: { ...filters, page } }),
@@ -165,7 +171,7 @@ function AdminQuotes() {
           </nav>
         </header>
 
-        <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <section className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
           <StatCard label="New requests" value={stats.data?.newCount} icon={<Inbox className="size-5" />} />
           <StatCard label="Urgent" value={stats.data?.urgent} icon={<AlertTriangle className="size-5" />} />
           <StatCard label="Last 7 days" value={stats.data?.lastSevenDays} icon={<TrendingUp className="size-5" />} />
@@ -203,7 +209,7 @@ function AdminQuotes() {
         <DateFilters key={resetKey} value={period} availableMonths={stats.data?.availableMonths ?? []} onChange={setPeriod} />
         </section>
         {(stats.isError || quotes.isError) && <p role="alert" className="mt-4 text-sm text-destructive">Could not load quotes. Check the date range and try again.</p>}
-        <AnalyticsView data={stats.data} />
+        <AnalyticsView data={stats.data} sgiCount={sgiStats.data?.total} />
         <div className="mt-5 flex flex-wrap items-center gap-3 text-sm">
           <label className="flex items-center gap-2"><Checkbox aria-label="Select this page" checked={!!quotes.data?.rows.length && (allMatching || quotes.data.rows.every((q) => selected.includes(q.id)))} onCheckedChange={(checked) => { setAllMatching(false); const ids = quotes.data?.rows.map((q) => q.id) ?? []; setSelected((s) => checked ? [...new Set([...s, ...ids])] : s.filter((id) => !ids.includes(id))); }} />Select this page</label>
           <span>{allMatching ? total : selected.length} selected</span>
@@ -282,12 +288,12 @@ function AdminQuotes() {
 
 function StatCard({ label, value, icon }: { label: string; value?: number; icon: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-5 shadow-soft">
+    <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card px-4 py-3 shadow-soft">
       <span className="flex items-center gap-2 text-sm text-muted-foreground">
         {icon}
         {label}
       </span>
-      <p className="mt-2 text-3xl font-semibold text-foreground">{value ?? "—"}</p>
+      <p className="text-xl font-semibold text-foreground">{value ?? "—"}</p>
     </div>
   );
 }
