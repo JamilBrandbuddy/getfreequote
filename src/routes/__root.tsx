@@ -6,6 +6,7 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  useRouterState,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
@@ -13,6 +14,7 @@ import appCss from "../styles.css?url";
 import { Footer } from "../components/Footer";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
+import { AdminBackdrop } from "@/components/admin/AdminBackdrop";
 
 
 function NotFoundComponent() {
@@ -137,13 +139,24 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const isAdmin = useRouterState({ select: (s) => s.location.pathname.startsWith("/admin") });
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      {isAdmin ? (
+        <div className="admin-glass dark relative isolate min-h-screen text-foreground">
+          <AdminBackdrop />
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+          <Footer />
+        </div>
+      ) : (
+        <>
+          <Outlet />
+          <Footer />
+        </>
+      )}
       <Toaster />
-      <Footer />
     </QueryClientProvider>
   );
 }
