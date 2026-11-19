@@ -43,6 +43,13 @@
       "when": 1795059081277,
       "tag": "0005_marketing_performance_reports",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795063441554,
+      "tag": "0006_sgi_insurance_filter",
+      "breakpoints": true
     }
   ]
 }
