@@ -60,7 +60,7 @@ function CustomersPage() {
 
   return (
     <main className="min-h-screen bg-muted/40 px-4 py-10 sm:px-8">
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-[1380px]">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="text-2xl font-semibold text-foreground">All Customers</h1>

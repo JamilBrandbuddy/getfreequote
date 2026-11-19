@@ -91,7 +91,7 @@ function Editor() {
   if (q.error) return <main className="p-8"><Button asChild variant="ghost"><Link to="/admin/performance"><ArrowLeft /> Back</Link></Button><p role="alert" className="mt-4 text-destructive">{q.error.message}</p></main>;
   if (!r || !data) return <main className="p-8">Loading…</main>;
 
-  return <main className="min-h-screen bg-muted/40 px-4 py-8 sm:px-8"><div className="mx-auto max-w-6xl">
+  return <main className="min-h-screen bg-muted/40 px-4 py-8 sm:px-8"><div className="mx-auto max-w-[1380px]">
     <Button asChild variant="ghost"><Link to="/admin/performance"><ArrowLeft /> Back to performance</Link></Button>
     <div className="mt-4 flex flex-wrap items-center gap-3">
       <h1 className="text-2xl font-semibold">{periodLabel(r.period_year, r.period_month)} report</h1>

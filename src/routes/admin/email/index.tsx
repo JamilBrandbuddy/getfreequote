@@ -61,7 +61,7 @@ function EmailPage() {
   const history = (d?.campaigns ?? []).filter((c: any) => c.status !== "draft");
   return (
     <main className="min-h-screen bg-muted/40 px-4 py-10 sm:px-8">
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-[1380px]">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div><h1 className="text-2xl font-semibold text-foreground">Bulk Email Campaigns</h1><p className="mt-1 text-sm text-muted-foreground">Write, test and send compliant emails to eligible customers.</p></div>
           <div className="flex flex-wrap gap-2">

@@ -81,7 +81,7 @@ function CampaignPage() {
 
   return (
     <main className="min-h-screen bg-muted/40 px-4 py-10 sm:px-8">
-      <div className="mx-auto max-w-6xl space-y-6">
+      <div className="mx-auto max-w-[1380px] space-y-6">
         <header className="flex flex-wrap items-end justify-between gap-3">
           <div><Link to="/admin/email" className="text-sm text-primary hover:underline">← All campaigns</Link><h1 className="mt-1 text-2xl font-semibold">{d!.name || "Untitled campaign"}</h1>
             <p className="text-sm text-muted-foreground">Create → Save draft → Preview → Test → Review recipients → Confirm & send · Status: <strong>{c.status}</strong></p></div>

@@ -150,7 +150,7 @@ function AdminQuotes() {
 
   return (
     <main className="min-h-screen bg-muted/40 px-4 py-10 sm:px-8">
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-[1380px]">
         <header className="grid min-w-0 gap-4">
           <div className="min-w-0">
             <h1 className="text-2xl font-semibold text-foreground">Quote requests</h1>
