@@ -225,3 +225,54 @@
 @media (prefers-reduced-motion: reduce) {
   .admin-backdrop iframe { display: none; }
 }
+
+/* Glass hover: cursor spotlight + border light reflection */
+.admin-glass .bg-card,
+.admin-glass .rounded-xl.border,
+.admin-glass .rounded-lg.border {
+  position: relative;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.admin-glass .bg-card::before,
+.admin-glass .rounded-xl.border::before,
+.admin-glass .rounded-lg.border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), oklch(0.85 0.12 230 / 18%), transparent 50%);
+  padding: 1px;
+}
+.admin-glass .bg-card::after,
+.admin-glass .rounded-xl.border::after,
+.admin-glass .rounded-lg.border::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), oklch(0.92 0.13 225 / 100%), transparent 65%);
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+.admin-glass .bg-card:hover::before,
+.admin-glass .rounded-xl.border:hover::before,
+.admin-glass .rounded-lg.border:hover::before,
+.admin-glass .bg-card:hover::after,
+.admin-glass .rounded-xl.border:hover::after,
+.admin-glass .rounded-lg.border:hover::after {
+  opacity: 1;
+}
+.admin-glass .bg-card:hover,
+.admin-glass .rounded-xl.border:hover,
+.admin-glass .rounded-lg.border:hover {
+  box-shadow: inset 0 1px 0 var(--glass-highlight), 0 24px 60px -20px oklch(0.6 0.15 230 / 35%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .admin-glass .bg-card::before, .admin-glass .bg-card::after { transition: none; }
+}
