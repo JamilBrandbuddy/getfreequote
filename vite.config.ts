@@ -22,6 +22,12 @@ export default defineConfig({
   vite: {
     resolve: {
       alias: {
+        // htmlparser2 v12 needs entities v8 subpath exports; it is nested under htmlparser2.
+        "entities/decode": path.resolve(
+          process.cwd(),
+          "node_modules/htmlparser2/node_modules/entities/dist/decode.js",
+        ),
+        // @react-email/render and dom-serializer need entities v4 (hoisted at root).
         "entities/lib/decode.js": path.resolve(process.cwd(), "node_modules/entities/lib/decode.js"),
         "entities/lib/encode.js": path.resolve(process.cwd(), "node_modules/entities/lib/encode.js"),
         entities: path.resolve(process.cwd(), "node_modules/entities"),
