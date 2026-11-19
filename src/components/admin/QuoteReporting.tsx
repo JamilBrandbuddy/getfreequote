@@ -25,17 +25,17 @@ export function RegionFilter({ value, onChange }: { value: string[]; onChange: (
 export function monthLabel(month: string) {
   return new Date(`${month}-01T12:00:00Z`).toLocaleDateString("en-CA", { month: "long", year: "numeric", timeZone: "America/Regina" });
 }
-export function DateFilters({ value, onChange, availableMonths, initialMode = "all" }: { value: ReportingFilters; onChange: (value: ReportingFilters) => void; availableMonths: string[]; initialMode?: string }) {
+export function DateFilters({ value, onChange, availableMonths, initialMode = "all", inline = false }: { inline?: boolean; value: ReportingFilters; onChange: (value: ReportingFilters) => void; availableMonths: string[]; initialMode?: string }) {
   const [mode, setMode] = useState(initialMode);
   const [addMonth, setAddMonth] = useState("");
   const months = value.months ?? [];
   function changeMode(mode: string) { setMode(mode); onChange({ ...value, months: [], startDate: undefined, endDate: undefined }); }
   function toggle(month: string) { onChange({ ...value, months: months.includes(month) ? months.filter((m) => m !== month) : [...months, month].sort() }); }
-  return <div className="mt-4 space-y-3 border-t border-border pt-4">
+  return <div className={inline ? "space-y-3" : "mt-4 space-y-3 border-t border-border pt-4"}>
     <div className="flex flex-wrap items-center gap-3">
-      <span className="text-sm font-medium">Submission period</span>
-      <Select value={mode} onValueChange={changeMode}><SelectTrigger aria-label="Submission period" className="w-full sm:w-52"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">All months</SelectItem><SelectItem value="months">Selected months</SelectItem><SelectItem value="range">Custom date range</SelectItem></SelectContent></Select>
-      <span className="text-xs text-muted-foreground">America/Regina</span>
+      {!inline && <span className="text-sm font-medium">Submission period</span>}
+      <Select value={mode} onValueChange={changeMode}><SelectTrigger aria-label="Submission period" className={inline ? "h-11 w-44 rounded-xl" : "w-full sm:w-52"}><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">{inline ? "All periods" : "All months"}</SelectItem><SelectItem value="months">Selected months</SelectItem><SelectItem value="range">Custom date range</SelectItem></SelectContent></Select>
+      {!inline && <span className="text-xs text-muted-foreground">America/Regina</span>}
     </div>
     {mode === "months" && <>
       <div className="flex flex-wrap gap-3">{[...new Set([...availableMonths, ...months])].sort().reverse().map((m) => <label key={m} className="flex items-center gap-2 text-sm"><Checkbox aria-label={monthLabel(m)} checked={months.includes(m)} onCheckedChange={() => toggle(m)} />{monthLabel(m)}</label>)}</div>

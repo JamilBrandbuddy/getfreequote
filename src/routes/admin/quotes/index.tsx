@@ -179,34 +179,24 @@ function AdminQuotes() {
         </section>
 
         <section className="mt-6 border-y border-border py-4">
-        <div className="grid gap-3 md:grid-cols-[1fr_auto_auto_auto]">
-          <div className="relative">
+        <div className="flex flex-wrap items-start gap-3">
+          <div className="relative min-w-[14rem] flex-1 basis-60 xl:max-w-xs">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search reference, name, phone, email or vehicle"
+              placeholder="Search reference, name, phone…"
               aria-label="Search quotes"
               className="h-11 rounded-xl pl-9"
             />
           </div>
           <FilterSelect label="Status" value={status} onChange={(v) => { setStatus(v); setPage(0); }} options={STATUSES} />
-          <FilterSelect label="Priority" value={priority} onChange={(v) => { setPriority(v); setPage(0); }} options={PRIORITIES} />
-          <FilterSelect
-            label="Sort"
-            value={sort}
-            onChange={(v) => setSort(v as typeof sort)}
-            options={["newest", "oldest", "priority"]}
-            includeAll={false}
-          />
-        </div>
-        <div className="mt-3 flex flex-wrap gap-3">
           <FilterSelect label="Service" value={service} onChange={setService} options={[...(stats.data?.services ?? []), "sgi_any"]} />
           <FilterSelect label="Conversion" value={conversion} onChange={(v) => setConversion(v as typeof conversion)} options={["pending", "converted", "not_converted"]} />
           <RegionFilter value={regions} onChange={setRegions} />
-          <Button variant="ghost" onClick={() => { setSearch(""); setDebounced(""); setStatus("all"); setPriority("all"); setService("all"); setConversion("all"); setRegions([]); setSort("newest"); setPeriod({}); setResetKey((k) => k + 1); }}>Reset filters</Button>
+          <DateFilters inline key={resetKey} value={period} availableMonths={stats.data?.availableMonths ?? []} onChange={setPeriod} />
+          <Button variant="ghost" className="h-11" onClick={() => { setSearch(""); setDebounced(""); setStatus("all"); setPriority("all"); setService("all"); setConversion("all"); setRegions([]); setSort("newest"); setPeriod({}); setResetKey((k) => k + 1); }}>Reset filters</Button>
         </div>
-        <DateFilters key={resetKey} value={period} availableMonths={stats.data?.availableMonths ?? []} onChange={setPeriod} />
         </section>
         {(stats.isError || quotes.isError) && <p role="alert" className="mt-4 text-sm text-destructive">Could not load quotes. Check the date range and try again.</p>}
         <AnalyticsView data={stats.data} sgiCount={sgiStats.data?.total} />
