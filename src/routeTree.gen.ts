@@ -14,6 +14,8 @@ import { Route as GetQuoteRouteImport } from './routes/get-quote'
 import { Route as ThankYouRouteImport } from './routes/thank-you'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as AdminCustomersIndexRouteImport } from './routes/admin/customers/index'
+import { Route as AdminCustomersCustomerIdRouteImport } from './routes/admin/customers/$customerId'
 import { Route as AdminQuotesIndexRouteImport } from './routes/admin/quotes/index'
 import { Route as AdminQuotesIdRouteImport } from './routes/admin/quotes/$id'
 import { Route as ApiPublicQuoteSubmissionsRouteImport } from './routes/api/public/quote-submissions'
@@ -44,6 +46,17 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/admin/users',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminCustomersIndexRoute = AdminCustomersIndexRouteImport.update({
+  id: '/admin/customers/',
+  path: '/admin/customers/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminCustomersCustomerIdRoute =
+  AdminCustomersCustomerIdRouteImport.update({
+    id: '/admin/customers/$customerId',
+    path: '/admin/customers/$customerId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminQuotesIndexRoute = AdminQuotesIndexRouteImport.update({
   id: '/admin/quotes/',
   path: '/admin/quotes/',
@@ -73,8 +86,10 @@ export interface FileRoutesByFullPath {
   '/thank-you': typeof ThankYouRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/customers/$customerId': typeof AdminCustomersCustomerIdRoute
   '/admin/quotes/$id': typeof AdminQuotesIdRoute
   '/api/public/quote-submissions': typeof ApiPublicQuoteSubmissionsRoute
+  '/admin/customers/': typeof AdminCustomersIndexRoute
   '/admin/quotes/': typeof AdminQuotesIndexRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -84,8 +99,10 @@ export interface FileRoutesByTo {
   '/thank-you': typeof ThankYouRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/customers/$customerId': typeof AdminCustomersCustomerIdRoute
   '/admin/quotes/$id': typeof AdminQuotesIdRoute
   '/api/public/quote-submissions': typeof ApiPublicQuoteSubmissionsRoute
+  '/admin/customers': typeof AdminCustomersIndexRoute
   '/admin/quotes': typeof AdminQuotesIndexRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -96,8 +113,10 @@ export interface FileRoutesById {
   '/thank-you': typeof ThankYouRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/customers/$customerId': typeof AdminCustomersCustomerIdRoute
   '/admin/quotes/$id': typeof AdminQuotesIdRoute
   '/api/public/quote-submissions': typeof ApiPublicQuoteSubmissionsRoute
+  '/admin/customers/': typeof AdminCustomersIndexRoute
   '/admin/quotes/': typeof AdminQuotesIndexRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -109,8 +128,10 @@ export interface FileRouteTypes {
     | '/thank-you'
     | '/admin/login'
     | '/admin/users'
+    | '/admin/customers/$customerId'
     | '/admin/quotes/$id'
     | '/api/public/quote-submissions'
+    | '/admin/customers/'
     | '/admin/quotes/'
     | '/lovable/email/transactional/preview'
   fileRoutesByTo: FileRoutesByTo
@@ -120,8 +141,10 @@ export interface FileRouteTypes {
     | '/thank-you'
     | '/admin/login'
     | '/admin/users'
+    | '/admin/customers/$customerId'
     | '/admin/quotes/$id'
     | '/api/public/quote-submissions'
+    | '/admin/customers'
     | '/admin/quotes'
     | '/lovable/email/transactional/preview'
   id:
@@ -131,8 +154,10 @@ export interface FileRouteTypes {
     | '/thank-you'
     | '/admin/login'
     | '/admin/users'
+    | '/admin/customers/$customerId'
     | '/admin/quotes/$id'
     | '/api/public/quote-submissions'
+    | '/admin/customers/'
     | '/admin/quotes/'
     | '/lovable/email/transactional/preview'
   fileRoutesById: FileRoutesById
@@ -143,8 +168,10 @@ export interface RootRouteChildren {
   ThankYouRoute: typeof ThankYouRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminUsersRoute: typeof AdminUsersRoute
+  AdminCustomersCustomerIdRoute: typeof AdminCustomersCustomerIdRoute
   AdminQuotesIdRoute: typeof AdminQuotesIdRoute
   ApiPublicQuoteSubmissionsRoute: typeof ApiPublicQuoteSubmissionsRoute
+  AdminCustomersIndexRoute: typeof AdminCustomersIndexRoute
   AdminQuotesIndexRoute: typeof AdminQuotesIndexRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
@@ -186,6 +213,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/customers/': {
+      id: '/admin/customers/'
+      path: '/admin/customers'
+      fullPath: '/admin/customers/'
+      preLoaderRoute: typeof AdminCustomersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/customers/$customerId': {
+      id: '/admin/customers/$customerId'
+      path: '/admin/customers/$customerId'
+      fullPath: '/admin/customers/$customerId'
+      preLoaderRoute: typeof AdminCustomersCustomerIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/quotes/': {
       id: '/admin/quotes/'
       path: '/admin/quotes'
@@ -223,8 +264,10 @@ const rootRouteChildren: RootRouteChildren = {
   ThankYouRoute: ThankYouRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminUsersRoute: AdminUsersRoute,
+  AdminCustomersCustomerIdRoute: AdminCustomersCustomerIdRoute,
   AdminQuotesIdRoute: AdminQuotesIdRoute,
   ApiPublicQuoteSubmissionsRoute: ApiPublicQuoteSubmissionsRoute,
+  AdminCustomersIndexRoute: AdminCustomersIndexRoute,
   AdminQuotesIndexRoute: AdminQuotesIndexRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }
