@@ -230,19 +230,19 @@ function AdminQuotes() {
                   <Link
                     to="/admin/quotes/$id"
                     params={{ id: q.id }}
-                    className="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-2 px-5 py-4 transition hover:bg-muted/60 lg:grid lg:grid-cols-[11rem_minmax(12rem,1fr)_4.5rem_9rem_5.5rem_7.5rem_8.5rem_6rem] lg:justify-items-start"
+                    className="grid min-w-0 flex-1 grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center justify-items-start gap-x-4 gap-y-2 px-5 py-4 transition hover:bg-muted/60 md:grid-cols-[10rem_minmax(8rem,1fr)_7.5rem_8rem] md:gap-x-3 md:justify-items-start lg:grid-cols-[10rem_minmax(9rem,1fr)_7.5rem_7.5rem_4.5rem_6.5rem_7rem_5.5rem] lg:justify-items-start"
                   >
-                    <span className="min-w-[9rem] font-mono text-sm font-semibold text-foreground">
+                    <span className="col-span-2 md:col-span-1 min-w-[9rem] font-mono text-sm font-semibold text-foreground">
                       {q.public_reference}
                     </span>
-                    <span className="min-w-[10rem] flex-1 text-sm text-foreground lg:min-w-0 lg:w-full">
+                    <span className="col-span-2 md:col-span-1 min-w-0 flex-1 text-sm text-foreground md:min-w-0 md:w-full">
                       {q.customer_name}
                       <span className="block text-xs text-muted-foreground">
                         {[q.vehicle_year, q.vehicle_make, q.vehicle_model].filter(Boolean).join(" ") || "Vehicle TBC"}
                       </span>
                     </span>
-                    <span className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground" title="Phone area code region">{regionLabel(q.phone_region)}</span>
-                    <span className="truncate text-xs capitalize text-muted-foreground lg:max-w-full">
+                    <span className="whitespace-nowrap rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground" title="Phone area code region">{regionLabel(q.phone_region)}</span>
+                    <span className="truncate text-xs capitalize text-muted-foreground md:max-w-full">
                       {(q.requested_service ?? "—").replace(/_/g, " ")}
                     </span>
                     <span className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${priorityClass[q.priority] ?? ""}`}>
