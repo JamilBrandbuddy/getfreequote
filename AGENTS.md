@@ -14,3 +14,4 @@
 - Keep user-role administration in authenticated roles.functions handlers with an Admin check before privileged account lookups; operational permissions must not grant privilege assignment.
 - Use filtered_reporting_quotes for list, analytics and exports so combined filters and Regina boundaries cannot diverge; aggregate in SQL and paginate exports on the server.
 - Generate XLSX in memory through the maintained SheetJS distribution inside server-only export helpers to avoid filesystem-dependent writers in the Worker; export explicit safe columns only.
+- Derive phone area-code regions from src/config/canadianAreaCodes.ts mirrored by SQL public.phone_region_code (never stored over phone fields); change both together via a new migration so dashboard filters and exports stay consistent.
