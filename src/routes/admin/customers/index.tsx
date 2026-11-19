@@ -125,7 +125,7 @@ function Filter({ label, value, onChange, options }: { label: string; value: str
   return (
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger aria-label={label} className="h-11 min-w-36 rounded-xl"><SelectValue placeholder={label} /></SelectTrigger>
-      <SelectContent><SelectItem value="all">All {label.toLowerCase()}s</SelectItem>{options.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
+      <SelectContent><SelectItem value="all">All {label === "Status" ? "statuses" : label.toLowerCase() + "s"}</SelectItem>{options.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
     </Select>
   );
 }
