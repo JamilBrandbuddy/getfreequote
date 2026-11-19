@@ -14,8 +14,11 @@ import { Route as GetQuoteRouteImport } from './routes/get-quote'
 import { Route as ThankYouRouteImport } from './routes/thank-you'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as UnsubscribeTokenRouteImport } from './routes/unsubscribe/$token'
 import { Route as AdminCustomersIndexRouteImport } from './routes/admin/customers/index'
 import { Route as AdminCustomersCustomerIdRouteImport } from './routes/admin/customers/$customerId'
+import { Route as AdminEmailIndexRouteImport } from './routes/admin/email/index'
+import { Route as AdminEmailCampaignIdRouteImport } from './routes/admin/email/$campaignId'
 import { Route as AdminQuotesIndexRouteImport } from './routes/admin/quotes/index'
 import { Route as AdminQuotesIdRouteImport } from './routes/admin/quotes/$id'
 import { Route as ApiPublicQuoteSubmissionsRouteImport } from './routes/api/public/quote-submissions'
@@ -46,6 +49,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/admin/users',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UnsubscribeTokenRoute = UnsubscribeTokenRouteImport.update({
+  id: '/unsubscribe/$token',
+  path: '/unsubscribe/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminCustomersIndexRoute = AdminCustomersIndexRouteImport.update({
   id: '/admin/customers/',
   path: '/admin/customers/',
@@ -57,6 +65,16 @@ const AdminCustomersCustomerIdRoute =
     path: '/admin/customers/$customerId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AdminEmailIndexRoute = AdminEmailIndexRouteImport.update({
+  id: '/admin/email/',
+  path: '/admin/email/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminEmailCampaignIdRoute = AdminEmailCampaignIdRouteImport.update({
+  id: '/admin/email/$campaignId',
+  path: '/admin/email/$campaignId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminQuotesIndexRoute = AdminQuotesIndexRouteImport.update({
   id: '/admin/quotes/',
   path: '/admin/quotes/',
@@ -86,10 +104,13 @@ export interface FileRoutesByFullPath {
   '/thank-you': typeof ThankYouRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/users': typeof AdminUsersRoute
+  '/unsubscribe/$token': typeof UnsubscribeTokenRoute
   '/admin/customers/$customerId': typeof AdminCustomersCustomerIdRoute
+  '/admin/email/$campaignId': typeof AdminEmailCampaignIdRoute
   '/admin/quotes/$id': typeof AdminQuotesIdRoute
   '/api/public/quote-submissions': typeof ApiPublicQuoteSubmissionsRoute
   '/admin/customers/': typeof AdminCustomersIndexRoute
+  '/admin/email/': typeof AdminEmailIndexRoute
   '/admin/quotes/': typeof AdminQuotesIndexRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -99,10 +120,13 @@ export interface FileRoutesByTo {
   '/thank-you': typeof ThankYouRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/users': typeof AdminUsersRoute
+  '/unsubscribe/$token': typeof UnsubscribeTokenRoute
   '/admin/customers/$customerId': typeof AdminCustomersCustomerIdRoute
+  '/admin/email/$campaignId': typeof AdminEmailCampaignIdRoute
   '/admin/quotes/$id': typeof AdminQuotesIdRoute
   '/api/public/quote-submissions': typeof ApiPublicQuoteSubmissionsRoute
   '/admin/customers': typeof AdminCustomersIndexRoute
+  '/admin/email': typeof AdminEmailIndexRoute
   '/admin/quotes': typeof AdminQuotesIndexRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -113,10 +137,13 @@ export interface FileRoutesById {
   '/thank-you': typeof ThankYouRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/users': typeof AdminUsersRoute
+  '/unsubscribe/$token': typeof UnsubscribeTokenRoute
   '/admin/customers/$customerId': typeof AdminCustomersCustomerIdRoute
+  '/admin/email/$campaignId': typeof AdminEmailCampaignIdRoute
   '/admin/quotes/$id': typeof AdminQuotesIdRoute
   '/api/public/quote-submissions': typeof ApiPublicQuoteSubmissionsRoute
   '/admin/customers/': typeof AdminCustomersIndexRoute
+  '/admin/email/': typeof AdminEmailIndexRoute
   '/admin/quotes/': typeof AdminQuotesIndexRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -128,10 +155,13 @@ export interface FileRouteTypes {
     | '/thank-you'
     | '/admin/login'
     | '/admin/users'
+    | '/unsubscribe/$token'
     | '/admin/customers/$customerId'
+    | '/admin/email/$campaignId'
     | '/admin/quotes/$id'
     | '/api/public/quote-submissions'
     | '/admin/customers/'
+    | '/admin/email/'
     | '/admin/quotes/'
     | '/lovable/email/transactional/preview'
   fileRoutesByTo: FileRoutesByTo
@@ -141,10 +171,13 @@ export interface FileRouteTypes {
     | '/thank-you'
     | '/admin/login'
     | '/admin/users'
+    | '/unsubscribe/$token'
     | '/admin/customers/$customerId'
+    | '/admin/email/$campaignId'
     | '/admin/quotes/$id'
     | '/api/public/quote-submissions'
     | '/admin/customers'
+    | '/admin/email'
     | '/admin/quotes'
     | '/lovable/email/transactional/preview'
   id:
@@ -154,10 +187,13 @@ export interface FileRouteTypes {
     | '/thank-you'
     | '/admin/login'
     | '/admin/users'
+    | '/unsubscribe/$token'
     | '/admin/customers/$customerId'
+    | '/admin/email/$campaignId'
     | '/admin/quotes/$id'
     | '/api/public/quote-submissions'
     | '/admin/customers/'
+    | '/admin/email/'
     | '/admin/quotes/'
     | '/lovable/email/transactional/preview'
   fileRoutesById: FileRoutesById
@@ -168,10 +204,13 @@ export interface RootRouteChildren {
   ThankYouRoute: typeof ThankYouRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminUsersRoute: typeof AdminUsersRoute
+  UnsubscribeTokenRoute: typeof UnsubscribeTokenRoute
   AdminCustomersCustomerIdRoute: typeof AdminCustomersCustomerIdRoute
+  AdminEmailCampaignIdRoute: typeof AdminEmailCampaignIdRoute
   AdminQuotesIdRoute: typeof AdminQuotesIdRoute
   ApiPublicQuoteSubmissionsRoute: typeof ApiPublicQuoteSubmissionsRoute
   AdminCustomersIndexRoute: typeof AdminCustomersIndexRoute
+  AdminEmailIndexRoute: typeof AdminEmailIndexRoute
   AdminQuotesIndexRoute: typeof AdminQuotesIndexRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
@@ -213,6 +252,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/unsubscribe/$token': {
+      id: '/unsubscribe/$token'
+      path: '/unsubscribe/$token'
+      fullPath: '/unsubscribe/$token'
+      preLoaderRoute: typeof UnsubscribeTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/customers/': {
       id: '/admin/customers/'
       path: '/admin/customers'
@@ -225,6 +271,20 @@ declare module '@tanstack/react-router' {
       path: '/admin/customers/$customerId'
       fullPath: '/admin/customers/$customerId'
       preLoaderRoute: typeof AdminCustomersCustomerIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/email/': {
+      id: '/admin/email/'
+      path: '/admin/email'
+      fullPath: '/admin/email/'
+      preLoaderRoute: typeof AdminEmailIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/email/$campaignId': {
+      id: '/admin/email/$campaignId'
+      path: '/admin/email/$campaignId'
+      fullPath: '/admin/email/$campaignId'
+      preLoaderRoute: typeof AdminEmailCampaignIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/quotes/': {
@@ -264,10 +324,13 @@ const rootRouteChildren: RootRouteChildren = {
   ThankYouRoute: ThankYouRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminUsersRoute: AdminUsersRoute,
+  UnsubscribeTokenRoute: UnsubscribeTokenRoute,
   AdminCustomersCustomerIdRoute: AdminCustomersCustomerIdRoute,
+  AdminEmailCampaignIdRoute: AdminEmailCampaignIdRoute,
   AdminQuotesIdRoute: AdminQuotesIdRoute,
   ApiPublicQuoteSubmissionsRoute: ApiPublicQuoteSubmissionsRoute,
   AdminCustomersIndexRoute: AdminCustomersIndexRoute,
+  AdminEmailIndexRoute: AdminEmailIndexRoute,
   AdminQuotesIndexRoute: AdminQuotesIndexRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }

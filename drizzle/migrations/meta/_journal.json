@@ -29,6 +29,13 @@
       "when": 1795055829550,
       "tag": "0003_quote_conversion_tracking",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1795056667933,
+      "tag": "0004_bulk_email_campaigns",
+      "breakpoints": true
     }
   ]
 }

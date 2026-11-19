@@ -155,6 +155,7 @@ function AdminQuotes() {
           <div className="flex flex-wrap gap-2">
           <QuoteExport filters={filters} months={stats.data?.availableMonths ?? []} selectedIds={selected} allMatching={allMatching} total={quotes.data?.total ?? 0} />
           <Button asChild variant="outline" className="h-11 rounded-xl"><Link to="/admin/customers">All Customers</Link></Button>
+          <Button asChild variant="outline" className="h-11 rounded-xl"><Link to="/admin/email">Bulk Email Campaigns</Link></Button>
           {session.data?.canManageRoles && <Button asChild variant="outline" className="h-11 rounded-xl"><Link to="/admin/users">User roles</Link></Button>}
           <Button variant="outline" onClick={signOut} className="h-11 rounded-xl">
             <LogOut className="size-4" aria-hidden />

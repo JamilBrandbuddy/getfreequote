@@ -16,3 +16,4 @@
 - Generate XLSX in memory through the maintained SheetJS distribution inside server-only export helpers to avoid filesystem-dependent writers in the Worker; export explicit safe columns only.
 - Derive phone area-code regions from src/config/canadianAreaCodes.ts mirrored by SQL public.phone_region_code (never stored over phone fields); change both together via a new migration so dashboard filters and exports stay consistent.
 - Change quote conversion outcomes only through public.set_quote_conversion (a trigger blocks direct column writes) so every change is audited in quote_conversion_history; quote status only suggests outcomes.
+- Bulk email: send campaigns only via the separate marketing provider in campaigns.server.ts (MARKETING_RESEND_API_KEY), never the transactional app-email sender, so marketing cannot hurt quote-email deliverability; eligibility rules live in src/lib/email-campaign.ts.

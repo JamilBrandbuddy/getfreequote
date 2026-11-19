@@ -14,6 +14,346 @@ export type Database = {
   }
   public: {
     Tables: {
+      email_campaign_recipients: {
+        Row: {
+          attempts: number
+          campaign_id: string
+          created_at: string
+          customer_name: string | null
+          email: string
+          id: string
+          last_error: string | null
+          lawful_basis: string
+          provider_message_id: string | null
+          sent_at: string | null
+          service_type: string | null
+          status: string
+          unsubscribe_token: string
+        }
+        Insert: {
+          attempts?: number
+          campaign_id: string
+          created_at?: string
+          customer_name?: string | null
+          email: string
+          id?: string
+          last_error?: string | null
+          lawful_basis: string
+          provider_message_id?: string | null
+          sent_at?: string | null
+          service_type?: string | null
+          status?: string
+          unsubscribe_token?: string
+        }
+        Update: {
+          attempts?: number
+          campaign_id?: string
+          created_at?: string
+          customer_name?: string | null
+          email?: string
+          id?: string
+          last_error?: string | null
+          lawful_basis?: string
+          provider_message_id?: string | null
+          sent_at?: string | null
+          service_type?: string | null
+          status?: string
+          unsubscribe_token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_campaign_recipients_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "email_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_campaigns: {
+        Row: {
+          audience: Json
+          body_html: string
+          confirmed_at: string | null
+          confirmed_by: string | null
+          created_at: string
+          created_by: string | null
+          created_by_email: string | null
+          delivered_count: number | null
+          failed_count: number
+          id: string
+          last_test_at: string | null
+          last_test_to: string | null
+          message_type: string
+          name: string
+          preview_text: string
+          recipient_count: number
+          sent_at: string | null
+          sent_count: number
+          signature_id: string | null
+          status: string
+          subject: string
+          unsubscribed_count: number
+          updated_at: string
+        }
+        Insert: {
+          audience?: Json
+          body_html?: string
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          created_by_email?: string | null
+          delivered_count?: number | null
+          failed_count?: number
+          id?: string
+          last_test_at?: string | null
+          last_test_to?: string | null
+          message_type?: string
+          name: string
+          preview_text?: string
+          recipient_count?: number
+          sent_at?: string | null
+          sent_count?: number
+          signature_id?: string | null
+          status?: string
+          subject?: string
+          unsubscribed_count?: number
+          updated_at?: string
+        }
+        Update: {
+          audience?: Json
+          body_html?: string
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          created_by_email?: string | null
+          delivered_count?: number | null
+          failed_count?: number
+          id?: string
+          last_test_at?: string | null
+          last_test_to?: string | null
+          message_type?: string
+          name?: string
+          preview_text?: string
+          recipient_count?: number
+          sent_at?: string | null
+          sent_count?: number
+          signature_id?: string | null
+          status?: string
+          subject?: string
+          unsubscribed_count?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_campaigns_signature_id_fkey"
+            columns: ["signature_id"]
+            isOneToOne: false
+            referencedRelation: "email_signatures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_consents: {
+        Row: {
+          consent_type: string
+          consented_at: string
+          email: string
+          evidence: string | null
+          expires_at: string | null
+          id: string
+          recorded_at: string
+          recorded_by: string | null
+          source: string
+        }
+        Insert: {
+          consent_type: string
+          consented_at: string
+          email: string
+          evidence?: string | null
+          expires_at?: string | null
+          id?: string
+          recorded_at?: string
+          recorded_by?: string | null
+          source: string
+        }
+        Update: {
+          consent_type?: string
+          consented_at?: string
+          email?: string
+          evidence?: string | null
+          expires_at?: string | null
+          id?: string
+          recorded_at?: string
+          recorded_by?: string | null
+          source?: string
+        }
+        Relationships: []
+      }
+      email_settings: {
+        Row: {
+          facebook_review_url: string | null
+          google_review_url: string | null
+          id: boolean
+          mailing_address: string | null
+          reply_to: string | null
+          sender_email: string | null
+          sender_name: string
+          test_recipients: string[]
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          facebook_review_url?: string | null
+          google_review_url?: string | null
+          id?: boolean
+          mailing_address?: string | null
+          reply_to?: string | null
+          sender_email?: string | null
+          sender_name?: string
+          test_recipients?: string[]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          facebook_review_url?: string | null
+          google_review_url?: string | null
+          id?: boolean
+          mailing_address?: string | null
+          reply_to?: string | null
+          sender_email?: string | null
+          sender_name?: string
+          test_recipients?: string[]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      email_signatures: {
+        Row: {
+          address: string | null
+          brand_color: string
+          company_name: string | null
+          created_at: string
+          created_by: string | null
+          custom_html: string | null
+          email: string | null
+          facebook_url: string | null
+          id: string
+          instagram_url: string | null
+          is_default: boolean
+          job_title: string | null
+          name: string
+          phone: string | null
+          sender_name: string | null
+          show_logo: boolean
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          brand_color?: string
+          company_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          custom_html?: string | null
+          email?: string | null
+          facebook_url?: string | null
+          id?: string
+          instagram_url?: string | null
+          is_default?: boolean
+          job_title?: string | null
+          name: string
+          phone?: string | null
+          sender_name?: string | null
+          show_logo?: boolean
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          brand_color?: string
+          company_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          custom_html?: string | null
+          email?: string | null
+          facebook_url?: string | null
+          id?: string
+          instagram_url?: string | null
+          is_default?: boolean
+          job_title?: string | null
+          name?: string
+          phone?: string | null
+          sender_name?: string | null
+          show_logo?: boolean
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      email_suppressions: {
+        Row: {
+          campaign_id: string | null
+          created_at: string
+          email: string
+          reason: string
+          source: string | null
+        }
+        Insert: {
+          campaign_id?: string | null
+          created_at?: string
+          email: string
+          reason: string
+          source?: string | null
+        }
+        Update: {
+          campaign_id?: string | null
+          created_at?: string
+          email?: string
+          reason?: string
+          source?: string | null
+        }
+        Relationships: []
+      }
+      email_templates: {
+        Row: {
+          body_html: string
+          category: string
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          preview_text: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          body_html?: string
+          category: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          preview_text?: string
+          subject?: string
+          updated_at?: string
+        }
+        Update: {
+          body_html?: string
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          preview_text?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       quote_conversion_history: {
         Row: {
           changed_by: string | null
