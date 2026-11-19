@@ -315,7 +315,7 @@ function FilterSelect({
         <SelectValue placeholder={label} />
       </SelectTrigger>
       <SelectContent>
-        {includeAll && <SelectItem value="all">All {label.toLowerCase()}</SelectItem>}
+        {includeAll && <SelectItem value="all">{label === "SGI / Payment" ? "All payment types" : `All ${label.toLowerCase()}`}</SelectItem>}
         {options.map((option) => (
           <SelectItem key={option} value={option} className="capitalize">
             {OPTION_LABELS[option] ?? option.replace(/[-_]/g, " ")}
