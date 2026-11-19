@@ -68,7 +68,7 @@ function CustomersPage() {
           </div>
           <Button asChild variant="outline" className="h-11 rounded-xl"><Link to="/admin/quotes">Quote requests</Link></Button>
         </header>
-        <section className="mt-6 grid gap-3 border-y border-border py-4 md:grid-cols-[1fr_auto_auto_auto_auto]">
+        <section className="mt-6 grid gap-3 border-y border-border py-4 sm:grid-cols-2 xl:grid-cols-[1fr_auto_auto_auto_auto]">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
             <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search name, phone or email" aria-label="Search customers" className="h-11 rounded-xl pl-9" />
@@ -76,7 +76,7 @@ function CustomersPage() {
           <Filter label="Month" value={month} onChange={setMonth} options={d?.months ?? []} />
           <Filter label="Service" value={service} onChange={setService} options={d?.services ?? []} />
           <Filter label="Status" value={status} onChange={setStatus} options={STATUSES} />
-          <Select value={segment} onValueChange={setSegment}><SelectTrigger className="h-11 w-full rounded-xl sm:w-64" aria-label="Conversion segment"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">All conversion segments</SelectItem>{(Object.keys(SEGMENT_LABELS) as CustomerSegment[]).map((k) => <SelectItem key={k} value={k}>{SEGMENT_LABELS[k]}</SelectItem>)}</SelectContent></Select>
+          <Select value={segment} onValueChange={setSegment}><SelectTrigger className="h-11 w-full rounded-xl xl:w-64" aria-label="Conversion segment"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">All conversion segments</SelectItem>{(Object.keys(SEGMENT_LABELS) as CustomerSegment[]).map((k) => <SelectItem key={k} value={k}>{SEGMENT_LABELS[k]}</SelectItem>)}</SelectContent></Select>
           <RegionFilter value={regions} onChange={setRegions} />
         </section>
         <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
