@@ -7,6 +7,7 @@ import { Download, Loader2, Search, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getAdminSession } from "@/lib/admin.functions";
 import { listCustomers, exportCustomers } from "@/lib/customers.functions";
@@ -14,7 +15,6 @@ import { RegionFilter, regionLabel } from "@/components/admin/QuoteReporting";
 import { SEGMENT_LABELS, type CustomerSegment } from "@/lib/conversion";
 import { decodeExport, deliverFile } from "@/lib/download-file";
 
-const STATUSES = ["new", "contacted", "awaiting-information", "estimating", "quote-sent", "appointment-requested", "booked", "completed", "lost", "spam"];
 
 export const Route = createFileRoute("/admin/customers/")({
   ssr: false,
@@ -35,8 +35,9 @@ function CustomersPage() {
   const fetchList = useServerFn(listCustomers);
   const runExport = useServerFn(exportCustomers);
   const [search, setSearch] = useState(""); const [debounced, setDebounced] = useState("");
-  const [month, setMonth] = useState("all"); const [service, setService] = useState("all"); const [status, setStatus] = useState("all"); const [regions, setRegions] = useState<string[]>([]); const [segment, setSegment] = useState("all");
+  const [month, setMonth] = useState("all"); const [service, setService] = useState("all"); const status = "all"; const [regions, setRegions] = useState<string[]>([]); const [segment, setSegment] = useState("all");
   const [page, setPage] = useState(0); const [selected, setSelected] = useState<string[]>([]);
+  const [exportOpen, setExportOpen] = useState(false); const [scope, setScope] = useState<"filtered" | "all" | "selected">("filtered"); const [format, setFormat] = useState<"csv" | "xlsx">("xlsx");
   const [exporting, setExporting] = useState<string | null>(null); const [exportError, setExportError] = useState("");
   useEffect(() => { const t = setTimeout(() => setDebounced(search), 300); return () => clearTimeout(t); }, [search]);
   const filters = { search: debounced.trim(), month, service, status, regions, segment: segment as "all" };
@@ -50,7 +51,7 @@ function CustomersPage() {
     setExporting(`${scope}-${format}`); setExportError("");
     try {
       const res = await runExport({ data: { format, filters: scope === "all" ? {} : filters, ...(scope === "selected" ? { ids: selected } : {}) } });
-      await deliverFile(decodeExport(res.base64, res.mime), res.filename);
+      await deliverFile(decodeExport(res.base64, res.mime), res.filename); setExportOpen(false);
     } catch { setExportError("Export failed. Please try again."); } finally { setExporting(null); }
   };
 
@@ -68,26 +69,40 @@ function CustomersPage() {
             <h1 className="text-2xl font-semibold text-foreground">All Customers</h1>
             <p className="mt-1 text-sm text-muted-foreground">{d ? `${d.totalCustomers} customers from ${d.totalQuotes} quote requests` : "Loading…"}</p>
           </div>
-                  </header>
-        <section className="mt-6 grid gap-3 border-y border-border py-4 sm:grid-cols-2 xl:grid-cols-[1fr_auto_auto_auto_auto]">
+          <Dialog open={exportOpen} onOpenChange={setExportOpen}>
+            <DialogTrigger asChild><Button className="h-11 rounded-xl"><Download className="size-4" />Export Customers</Button></DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader><DialogTitle>Export customers</DialogTitle><DialogDescription>Download a spreadsheet of your customers.</DialogDescription></DialogHeader>
+              <div className="grid gap-4">
+                <div className="grid gap-2"><span className="text-sm font-medium">Which customers?</span>
+                  <Select value={scope} onValueChange={(v) => setScope(v as typeof scope)}><SelectTrigger className="h-11 rounded-xl" aria-label="Which customers"><SelectValue /></SelectTrigger><SelectContent>
+                    <SelectItem value="filtered">Current filtered list ({d?.total ?? 0})</SelectItem>
+                    <SelectItem value="all">All customers ({d?.totalCustomers ?? 0})</SelectItem>
+                    <SelectItem value="selected" disabled={!selected.length}>Selected in table ({selected.length})</SelectItem>
+                  </SelectContent></Select>
+                  {!selected.length && <p className="text-xs text-muted-foreground">Tip: tick the boxes in the table to export only chosen customers.</p>}
+                </div>
+                <div className="grid gap-2"><span className="text-sm font-medium">File type</span>
+                  <Select value={format} onValueChange={(v) => setFormat(v as typeof format)}><SelectTrigger className="h-11 rounded-xl" aria-label="File type"><SelectValue /></SelectTrigger><SelectContent>
+                    <SelectItem value="xlsx">Excel (.xlsx)</SelectItem><SelectItem value="csv">CSV (.csv)</SelectItem>
+                  </SelectContent></Select>
+                </div>
+                {exportError && <p role="alert" className="text-sm text-destructive">{exportError}</p>}
+                <Button className="h-11 rounded-xl" disabled={!!exporting} onClick={() => doExport(format, scope)}>{exporting ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}Download</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </header>
+        <section className="mt-6 grid gap-3 border-y border-border py-4 sm:grid-cols-2 xl:grid-cols-[1fr_auto_auto_auto]">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
             <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search name, phone or email" aria-label="Search customers" className="h-11 rounded-xl pl-9" />
           </div>
           <Filter label="Month" value={month} onChange={setMonth} options={d?.months ?? []} />
           <Filter label="Service" value={service} onChange={setService} options={d?.services ?? []} />
-          <Filter label="Status" value={status} onChange={setStatus} options={STATUSES} />
           <Select value={segment} onValueChange={setSegment}><SelectTrigger className="h-11 w-full rounded-xl xl:w-64" aria-label="Conversion segment"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">All conversion segments</SelectItem>{(Object.keys(SEGMENT_LABELS) as CustomerSegment[]).map((k) => <SelectItem key={k} value={k}>{SEGMENT_LABELS[k]}</SelectItem>)}</SelectContent></Select>
           <RegionFilter value={regions} onChange={setRegions} />
         </section>
-        <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
-          <Download className="size-4 text-muted-foreground" aria-hidden />
-          {(["filtered", "all", "selected"] as const).map((scope) => (["csv", "xlsx"] as const).map((f) => (
-            <Button key={scope + f} size="sm" variant="outline" className="rounded-lg" disabled={!!exporting || (scope === "selected" && !selected.length)} onClick={() => doExport(f, scope)}>
-              {exporting === `${scope}-${f}` && <Loader2 className="size-3 animate-spin" />}{scope === "selected" ? `Selected (${selected.length})` : scope === "all" ? "All" : "Filtered"} {f.toUpperCase()}
-            </Button>)))}
-          {exportError && <span role="alert" className="text-destructive">{exportError}</span>}
-        </div>
         <p className="mt-3 text-xs text-muted-foreground">Conversion segments are recipient filters only. They do not give permission to send promotional email.</p>
         {list.isError && <p role="alert" className="mt-4 text-sm text-destructive">Could not load customers.</p>}
         <div className="mt-4 overflow-x-auto rounded-2xl border border-border bg-card shadow-sm">
