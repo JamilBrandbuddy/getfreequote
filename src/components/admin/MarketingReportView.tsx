@@ -39,7 +39,25 @@ export function MarketingReportView({ data, currency, highlights, quoteStats, pr
   const rate = quoteStats ? quoteConversionRate(quoteStats) : null;
   const prevRate = prev?.quoteStats ? quoteConversionRate(prev.quoteStats) : null;
   const g = googleDerived(s("gads"));
+  const num = (v: unknown) => (typeof v === "number" ? v : 0);
+  const quoteLeads = quoteStats?.submissions ?? 0;
+  const bookingLeads = num(s("booking")["bookings"]);
+  const contactLeads = num(s("contact")["inquiries"]);
+  const totalLeads = quoteLeads + bookingLeads + contactLeads;
+  const prevTotal = prev ? (prev.quoteStats?.submissions ?? 0) + num(p("booking")?.["bookings"]) + num(p("contact")?.["inquiries"]) : undefined;
+  const website = [...SECTIONS.find(x => x.key === "contact")!.metrics.map(m => ({ m, k: "contact" })), ...SECTIONS.find(x => x.key === "booking")!.metrics.map(m => ({ m, k: "booking" }))];
+  const hasWebsite = website.some(({ m, k }) => isNum(s(k)[m.key])) || data.sections["contact"]?.notes || data.sections["booking"]?.notes;
   return <div className="space-y-8">
+    <section className="rounded-2xl border-2 border-primary/40 bg-primary/10 p-6">
+      <p className="text-sm font-semibold uppercase tracking-wide text-primary">Total leads</p>
+      <p className="mt-1 text-5xl font-bold">{quoteStats ? totalLeads : "…"}</p>
+      {prevTotal !== undefined && <Change cur={totalLeads} prev={prevTotal} />}
+      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="rounded-xl border border-border bg-card p-3"><p className="text-xs text-muted-foreground">Quote submissions</p><p className="text-xl font-semibold">{quoteLeads}</p></div>
+        <div className="rounded-xl border border-border bg-card p-3"><p className="text-xs text-muted-foreground">Appointment bookings</p><p className="text-xl font-semibold">{bookingLeads}</p></div>
+        {contactLeads > 0 && <div className="rounded-xl border border-border bg-card p-3"><p className="text-xs text-muted-foreground">Contact inquiries</p><p className="text-xl font-semibold">{contactLeads}</p></div>}
+      </div>
+    </section>
     {highlights.trim() && <section className="rounded-xl border border-primary/30 bg-primary/5 p-5"><h2 className="font-semibold">Highlights & notes</h2><p className="mt-2 whitespace-pre-wrap text-sm">{highlights}</p></section>}
 
     <section><h2 className="text-lg font-semibold">Quote App performance</h2><p className="text-xs text-muted-foreground">Calculated automatically from submitted quotes (Regina time). Conversion rate = verified converted ÷ valid non-spam quotes.</p>
@@ -53,7 +71,12 @@ export function MarketingReportView({ data, currency, highlights, quoteStats, pr
       </div>}
     </section>
 
-    {SECTIONS.filter(x => x.key !== "meta" && x.key !== "gads" && (x.metrics.some(m => isNum(s(x.key)[m.key])) || data.sections[x.key]?.notes)).map(sec => <section key={sec.key}>
+    {hasWebsite && <section><h2 className="text-lg font-semibold">Website leads & bookings</h2><p className="text-xs text-muted-foreground">Contact form and booking plugin, entered manually</p>
+      <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">{website.map(({ m, k }) => <Kpi key={k + m.key} label={m.label} value={formatMetric(s(k)[m.key], m.unit, currency)} cur={s(k)[m.key]} prev={prev ? p(k)?.[m.key] ?? null : undefined} />)}</div>
+      {[data.sections["contact"]?.notes, data.sections["booking"]?.notes].filter(Boolean).map((n, i) => <p key={i} className="mt-2 whitespace-pre-wrap text-sm text-muted-foreground">{n}</p>)}
+    </section>}
+
+    {SECTIONS.filter(x => !["meta","gads","contact","booking"].includes(x.key) && (x.metrics.some(m => isNum(s(x.key)[m.key])) || data.sections[x.key]?.notes)).map(sec => <section key={sec.key}>
       <h2 className="text-lg font-semibold">{sec.title}</h2><p className="text-xs text-muted-foreground">{sec.source}</p>
       <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">{sec.metrics.map(m => <Kpi key={m.key} label={m.label} value={formatMetric(s(sec.key)[m.key], m.unit, currency)} cur={s(sec.key)[m.key]} prev={prev ? p(sec.key)?.[m.key] ?? null : undefined} note={m.hint} />)}</div>
       {data.sections[sec.key]?.notes && <p className="mt-2 whitespace-pre-wrap text-sm text-muted-foreground">{data.sections[sec.key]!.notes}</p>}
@@ -72,7 +95,7 @@ export function MarketingReportView({ data, currency, highlights, quoteStats, pr
 
     <section className="rounded-xl border border-border bg-muted/40 p-4 text-xs text-muted-foreground">
       <p className="font-semibold text-foreground">How to read these numbers</p>
-      <p className="mt-1">Platform-reported conversions, website form inquiries, quote submissions, verified converted customers, completed appointments and tracked calls are kept separate. One customer may appear in several of them (for example: clicks an ad, then submits a quote), so they are not added into one lead total. Figures that were not provided are left out of this report.</p>
+      <p className="mt-1">Platform-reported conversions, website form inquiries, quote submissions, verified converted customers, completed appointments and tracked calls are kept separate. One customer may appear in several of them (for example: clicks an ad, then submits a quote), so the Total leads figure counts quote submissions, appointment bookings and contact inquiries only. Figures that were not provided are left out of this report.</p>
     </section>
   </div>;
 }

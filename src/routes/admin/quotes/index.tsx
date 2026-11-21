@@ -17,7 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getAdminSession, listQuotes } from "@/lib/admin.functions";
 import { getQuoteAnalytics } from "@/lib/quote-reports.functions";
 import type { ReportingFilters } from "@/lib/quote-reporting";
-import { DateFilters, AnalyticsView, QuoteExport, RegionFilter, regionLabel } from "@/components/admin/QuoteReporting";
+import { DateFilters, AnalyticsView, RegionFilter, regionLabel } from "@/components/admin/QuoteReporting";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ConversionBadge, ConversionControl } from "@/components/admin/ConversionControl";
 
@@ -159,7 +159,6 @@ function AdminQuotes() {
             </p>
           </div>
           <nav aria-label="Quote request actions" className="grid min-w-0 grid-cols-1 items-center gap-2 sm:flex sm:flex-wrap">
-          <QuoteExport filters={filters} months={stats.data?.availableMonths ?? []} selectedIds={selected} allMatching={allMatching} total={quotes.data?.total ?? 0} triggerClassName="h-11 shrink-0 rounded-xl" />
           <Button asChild variant="outline" className="h-11 shrink-0 rounded-xl"><Link to="/admin/customers">All Customers</Link></Button>
           <Button asChild variant="outline" className="h-11 shrink-0 rounded-xl"><Link to="/admin/email">Bulk Email Campaigns</Link></Button>
           <Button asChild variant="outline" className="h-11 shrink-0 rounded-xl"><Link to="/admin/performance">Marketing Performance</Link></Button>
