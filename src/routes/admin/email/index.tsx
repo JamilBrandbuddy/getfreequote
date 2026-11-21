@@ -1,3 +1,4 @@
+import { AdminBackNav } from "@/components/admin/AdminBackNav";
 import { useEffect, useState } from "react";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -62,11 +63,11 @@ function EmailPage() {
   return (
     <main className="min-h-screen bg-muted/40 px-4 py-10 sm:px-8">
       <div className="mx-auto max-w-[1380px]">
+        <AdminBackNav />
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div><h1 className="text-2xl font-semibold text-foreground">Bulk Email Campaigns</h1><p className="mt-1 text-sm text-muted-foreground">Write, test and send compliant emails to eligible customers.</p></div>
           <div className="flex flex-wrap gap-2">
-            <Button asChild variant="outline" className="h-11 rounded-xl"><Link to="/admin/quotes">Quote requests</Link></Button>
-            <Button asChild variant="outline" className="h-11 rounded-xl"><Link to="/admin/customers">All Customers</Link></Button>
+                        <Button asChild variant="outline" className="h-11 rounded-xl"><Link to="/admin/customers">All Customers</Link></Button>
             <Button className="h-11 rounded-xl" disabled={creating || !d} onClick={() => newCampaign()}>{creating ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}Create campaign</Button>
           </div>
         </header>

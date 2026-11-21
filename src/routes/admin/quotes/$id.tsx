@@ -1,3 +1,4 @@
+import { AdminBackNav } from "@/components/admin/AdminBackNav";
 import { useEffect, useRef, useState } from "react";
 import { classifyPhone } from "@/config/canadianAreaCodes";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -100,10 +101,7 @@ function QuoteDetail() {
   return (
     <main className="min-h-screen bg-muted/40 px-4 py-10 sm:px-8">
       <div className="mx-auto max-w-5xl">
-        <Link to="/admin/quotes" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="size-4" aria-hidden />
-          Back to all quotes
-        </Link>
+        <AdminBackNav />
 
         <header className="mt-4 flex flex-wrap items-end justify-between gap-4">
           <div>

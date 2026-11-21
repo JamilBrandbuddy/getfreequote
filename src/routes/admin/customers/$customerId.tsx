@@ -1,3 +1,4 @@
+import { AdminBackNav } from "@/components/admin/AdminBackNav";
 import { conversionLabel } from "@/lib/conversion";
 import { useEffect } from "react";
 import { regionLabel } from "@/components/admin/QuoteReporting";
@@ -40,7 +41,7 @@ function CustomerPage() {
   return (
     <main className="min-h-screen bg-muted/40 px-4 py-10 sm:px-8">
       <div className="mx-auto max-w-4xl">
-        <Link to="/admin/customers" className="text-sm text-primary hover:underline">← All Customers</Link>
+        <AdminBackNav parent={{ to: "/admin/customers", label: "All Customers" }} />
         <section className="mt-4 rounded-2xl border border-border bg-card p-6 shadow-sm">
           <h1 className="text-2xl font-semibold text-foreground">{p.name}</h1>
           {p.ambiguous && <p className="mt-2 rounded-xl bg-accent/20 p-3 text-sm">This email is also used with another phone number, so those quotes are kept as a separate customer. Please review manually.</p>}

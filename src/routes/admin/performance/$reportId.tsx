@@ -1,3 +1,4 @@
+import { AdminBackNav } from "@/components/admin/AdminBackNav";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -92,7 +93,7 @@ function Editor() {
   if (!r || !data) return <main className="p-8">Loading…</main>;
 
   return <main className="min-h-screen bg-muted/40 px-4 py-8 sm:px-8"><div className="mx-auto max-w-[1380px]">
-    <Button asChild variant="ghost"><Link to="/admin/performance"><ArrowLeft /> Back to performance</Link></Button>
+    <AdminBackNav parent={{ to: "/admin/performance", label: "Marketing Performance" }} />
     <div className="mt-4 flex flex-wrap items-center gap-3">
       <h1 className="text-2xl font-semibold">{periodLabel(r.period_year, r.period_month)} report</h1>
       {r.current_version > 0 ? <Badge>Published v{r.current_version}</Badge> : <Badge variant="secondary">Draft — not visible to Riverbend</Badge>}

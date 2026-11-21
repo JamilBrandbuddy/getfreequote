@@ -1,3 +1,4 @@
+import { AdminBackNav } from "@/components/admin/AdminBackNav";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -30,7 +31,7 @@ function Users() {
   const roles = useQuery({ queryKey: ["role-assignments"], queryFn: () => listFn({}), enabled: session.data?.canManageRoles === true, retry: false });
   const change = useMutation({ mutationFn: (data: { assignmentId: string; role: "admin" | "marketing" }) => changeFn({ data }), onSuccess: () => { void cache.invalidateQueries({ queryKey: ["role-assignments"] }); } });
   return <main className="min-h-screen bg-muted/40 px-4 py-10 sm:px-8"><div className="mx-auto max-w-3xl">
-    <Button asChild variant="ghost"><Link to="/admin/quotes"><ArrowLeft /> Back to quotes</Link></Button>
+    <AdminBackNav />
     <h1 className="mt-6 text-2xl font-semibold">User roles</h1>
     {session.isPending ? <p className="mt-6">Loading…</p> : !session.data?.canManageRoles ? <p role="alert" className="mt-6 text-destructive">Only Admin can manage user roles.</p> : <>
       {(roles.isPending) && <p className="mt-6">Loading…</p>}

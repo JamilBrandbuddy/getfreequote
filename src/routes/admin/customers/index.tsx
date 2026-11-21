@@ -1,3 +1,4 @@
+import { AdminBackNav } from "@/components/admin/AdminBackNav";
 import { useEffect, useState } from "react";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -61,13 +62,13 @@ function CustomersPage() {
   return (
     <main className="min-h-screen bg-muted/40 px-4 py-10 sm:px-8">
       <div className="mx-auto max-w-[1380px]">
+        <AdminBackNav />
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="text-2xl font-semibold text-foreground">All Customers</h1>
             <p className="mt-1 text-sm text-muted-foreground">{d ? `${d.totalCustomers} customers from ${d.totalQuotes} quote requests` : "Loading…"}</p>
           </div>
-          <Button asChild variant="outline" className="h-11 rounded-xl"><Link to="/admin/quotes">Quote requests</Link></Button>
-        </header>
+                  </header>
         <section className="mt-6 grid gap-3 border-y border-border py-4 sm:grid-cols-2 xl:grid-cols-[1fr_auto_auto_auto_auto]">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />

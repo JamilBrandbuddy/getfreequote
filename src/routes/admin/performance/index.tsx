@@ -1,3 +1,4 @@
+import { AdminBackNav } from "@/components/admin/AdminBackNav";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -66,7 +67,7 @@ function Performance() {
   const label = (r: { period_year: number; period_month: number }) => `${MONTHS[r.period_month - 1]!.slice(0, 3)} ${String(r.period_year).slice(2)}`;
 
   return <main className="min-h-screen bg-muted/40 px-4 py-8 sm:px-8"><div className="mx-auto max-w-[1380px]">
-    <Button asChild variant="ghost"><Link to="/admin/quotes"><ArrowLeft /> Back to quotes</Link></Button>
+    <AdminBackNav />
     <h1 className="mt-4 text-2xl font-semibold">Marketing Performance</h1>
     <p className="text-sm text-muted-foreground">Monthly marketing results prepared by BrandBuddy for Riverbend Autoglass.</p>
     {session.isPending ? <p className="mt-6">Loading…</p> : !canView ? <p role="alert" className="mt-6 text-destructive">You do not have access to performance reports.</p> : <>
