@@ -56,6 +56,7 @@ function Campaigns({ rows, metrics, onChange, kindLabel, subLabel, google }: { r
         <Input aria-label={kindLabel} placeholder={kindLabel} value={r.kind} onChange={e => upd(i, { kind: e.target.value })} />
       </div>
       <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-5">{metrics.map(m => <MetricInput key={m.key} def={m} value={r.values[m.key]} onChange={v => upd(i, { values: { ...r.values, [m.key]: v } })} />)}</div>
+      {!google && <Input className="mt-3 md:w-96" aria-label="Result type" placeholder="Result type, e.g. per 1,000 people reached / per lead / per landing page view" value={r.resultType ?? ""} onChange={e => upd(i, { resultType: e.target.value })} />}
       {google && breakdownIssue(r) && <p className="mt-2 text-xs text-destructive">{breakdownIssue(r)}</p>}
       <div className="mt-2 flex gap-2"><Textarea aria-label="Reporting notes" placeholder="Reporting notes" value={r.notes} onChange={e => upd(i, { notes: e.target.value })} />
         <Button variant="ghost" size="icon" aria-label="Remove campaign" onClick={() => onChange(rows.filter((_, j) => j !== i))}><Trash2 /></Button></div>

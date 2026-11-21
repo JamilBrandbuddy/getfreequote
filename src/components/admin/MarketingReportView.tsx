@@ -1,4 +1,4 @@
-import { SECTIONS, META_CAMPAIGN_METRICS, GOOGLE_CAMPAIGN_METRICS, formatMetric, googleDerived, momChange, quoteConversionRate, sumRows, breakdownIssue, isNum, type ReportData, type QuoteStats, type CampaignRow, type MetricDef } from "@/lib/marketing-report";
+import { SECTIONS, META_CAMPAIGN_METRICS, GOOGLE_CAMPAIGN_METRICS, formatMetric, googleDerived, momChange, quoteConversionRate, sumRows, breakdownIssue, isNum, filledColumns, type ReportData, type QuoteStats, type CampaignRow, type MetricDef } from "@/lib/marketing-report";
 
 interface Props { data: ReportData; currency: string; highlights: string; quoteStats?: QuoteStats | null; prev?: { data: ReportData; quoteStats?: QuoteStats | null } | null }
 
@@ -9,7 +9,8 @@ function Change({ cur, prev }: { cur: unknown; prev: unknown }) {
 }
 
 function Kpi({ label, value, cur, prev, note }: { label: string; value: string; cur?: unknown; prev?: unknown; note?: string }) {
-  const muted = value === "Not entered" || value === "Not available";
+  if (value === "Not entered" || value === "Not available") return null;
+  const muted = false;
   return <div className="rounded-xl border border-border bg-card p-4">
     <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
     <p className={`mt-1 text-2xl font-semibold ${muted ? "text-base italic text-muted-foreground" : ""}`}>{value}</p>
@@ -19,13 +20,14 @@ function Kpi({ label, value, cur, prev, note }: { label: string; value: string; 
 }
 
 function CampaignTable({ rows, metrics, currency, google }: { rows: CampaignRow[]; metrics: MetricDef[]; currency: string; google?: boolean }) {
-  if (!rows.length) return <p className="text-sm italic text-muted-foreground">No campaigns entered.</p>;
+  metrics = filledColumns(rows, metrics);
+  if (!rows.length) return null;
   return <div className="overflow-x-auto rounded-xl border border-border"><table className="w-full text-sm">
     <thead className="bg-muted/60 text-left"><tr><th className="p-2">Campaign</th>{metrics.map(m => <th key={m.key} className="whitespace-nowrap p-2 text-right">{m.label}</th>)}</tr></thead>
     <tbody>{rows.map(r => <tr key={r.id} className="border-t border-border align-top">
-      <td className="p-2"><p className="font-medium">{r.name || "Untitled"}</p>{(r.sub || r.kind) && <p className="text-xs text-muted-foreground">{[r.sub, r.kind].filter(Boolean).join(" · ")}</p>}{r.notes && <p className="mt-1 text-xs">{r.notes}</p>}{google && breakdownIssue(r) && <p className="mt-1 text-xs text-destructive">{breakdownIssue(r)}</p>}</td>
+      <td className="p-2"><p className="font-medium">{r.name || "Untitled"}</p>{(r.sub || r.kind) && <p className="text-xs text-muted-foreground">{[r.sub, r.kind].filter(Boolean).join(" · ")}</p>}{r.resultType && isNum(r.values["costPerResult"]) && <p className="text-xs text-muted-foreground">Result: {r.resultType}</p>}{r.notes && <p className="mt-1 text-xs">{r.notes}</p>}{google && breakdownIssue(r) && <p className="mt-1 text-xs text-destructive">{breakdownIssue(r)}</p>}</td>
       {metrics.map(m => <td key={m.key} className="whitespace-nowrap p-2 text-right">{formatMetric(r.values[m.key], m.unit, currency)}</td>)}</tr>)}
-      <tr className="border-t-2 border-border bg-muted/30 font-medium"><td className="p-2">Total of entered campaigns</td>{metrics.map(m => <td key={m.key} className="whitespace-nowrap p-2 text-right">{formatMetric(sumRows(rows, m.key), m.unit, currency)}</td>)}</tr>
+      <tr className="border-t-2 border-border bg-muted/30 font-medium"><td className="p-2">Total of entered campaigns</td>{metrics.map(m => <td key={m.key} className="whitespace-nowrap p-2 text-right">{m.key === "costPerResult" ? "—" : formatMetric(sumRows(rows, m.key), m.unit, currency)}</td>)}</tr>
     </tbody></table>
     {!google && <p className="p-2 text-xs text-muted-foreground">Reach total adds campaign reach together; people may be counted in more than one campaign, so this is not unique account reach.</p>}
   </div>;
@@ -51,26 +53,26 @@ export function MarketingReportView({ data, currency, highlights, quoteStats, pr
       </div>}
     </section>
 
-    {SECTIONS.filter(x => x.key !== "meta" && x.key !== "gads").map(sec => <section key={sec.key}>
+    {SECTIONS.filter(x => x.key !== "meta" && x.key !== "gads" && (x.metrics.some(m => isNum(s(x.key)[m.key])) || data.sections[x.key]?.notes)).map(sec => <section key={sec.key}>
       <h2 className="text-lg font-semibold">{sec.title}</h2><p className="text-xs text-muted-foreground">{sec.source}</p>
       <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">{sec.metrics.map(m => <Kpi key={m.key} label={m.label} value={formatMetric(s(sec.key)[m.key], m.unit, currency)} cur={s(sec.key)[m.key]} prev={prev ? p(sec.key)?.[m.key] ?? null : undefined} note={m.hint} />)}</div>
       {data.sections[sec.key]?.notes && <p className="mt-2 whitespace-pre-wrap text-sm text-muted-foreground">{data.sections[sec.key]!.notes}</p>}
     </section>)}
 
-    {(["meta", "gads"] as const).map(key => { const sec = SECTIONS.find(x => x.key === key)!; return <section key={key}>
+    {(["meta", "gads"] as const).map(key => { const sec = SECTIONS.find(x => x.key === key)!; const camps = key === "meta" ? data.metaCampaigns : data.googleCampaigns; const hasSummary = sec.metrics.some(m => isNum(s(key)[m.key])); if (!hasSummary && !camps.length && !data.sections[key]?.notes) return null; return <section key={key}>
       <h2 className="text-lg font-semibold">{key === "meta" ? "Facebook / Meta Ads performance" : "Google Ads performance"}</h2><p className="text-xs text-muted-foreground">{sec.source}. Amounts in {currency}. Conversions are as reported by the ad platform.</p>
-      <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+      {hasSummary && <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
         {sec.metrics.map(m => <Kpi key={m.key} label={m.label} value={formatMetric(s(key)[m.key], m.unit, currency)} cur={s(key)[m.key]} prev={prev ? p(key)?.[m.key] ?? null : undefined} />)}
         {key === "gads" && <><Kpi label="CTR (calculated)" value={formatMetric(g.ctr, "percent")} /><Kpi label="Average CPC (calculated)" value={formatMetric(g.cpc, "money", currency)} /><Kpi label="Cost per conversion (calculated)" value={formatMetric(g.costPerConversion, "money", currency)} /></>}
-      </div>
+      </div>}
       {data.sections[key]?.notes && <p className="mt-2 whitespace-pre-wrap text-sm text-muted-foreground">{data.sections[key]!.notes}</p>}
-      <h3 className="mb-2 mt-4 text-sm font-semibold">Campaign breakdown</h3>
+      {camps.length > 0 && <h3 className="mb-2 mt-4 text-sm font-semibold">Campaign breakdown</h3>}
       <CampaignTable rows={key === "meta" ? data.metaCampaigns : data.googleCampaigns} metrics={key === "meta" ? META_CAMPAIGN_METRICS : GOOGLE_CAMPAIGN_METRICS} currency={currency} google={key === "gads"} />
     </section>; })}
 
     <section className="rounded-xl border border-border bg-muted/40 p-4 text-xs text-muted-foreground">
       <p className="font-semibold text-foreground">How to read these numbers</p>
-      <p className="mt-1">Platform-reported conversions, website form inquiries, quote submissions, verified converted customers, completed appointments and tracked calls are kept separate. One customer may appear in several of them (for example: clicks an ad, then submits a quote), so they are not added into one lead total. "Not entered" means no figure was provided; "Not available" means the source did not report it.</p>
+      <p className="mt-1">Platform-reported conversions, website form inquiries, quote submissions, verified converted customers, completed appointments and tracked calls are kept separate. One customer may appear in several of them (for example: clicks an ad, then submits a quote), so they are not added into one lead total. Figures that were not provided are left out of this report.</p>
     </section>
   </div>;
 }

@@ -51,6 +51,7 @@ export const SECTIONS: SectionDef[] = [
 
 export const META_CAMPAIGN_METRICS: MetricDef[] = [
   { key: "budget", label: "Budget", unit: "money" }, { key: "spend", label: "Spend", unit: "money" },
+  { key: "costPerResult", label: "Cost per result", unit: "money" },
   { key: "reach", label: "Reach", unit: "count" }, { key: "impressions", label: "Impressions", unit: "count" },
   { key: "clicks", label: "Clicks", unit: "count" }, { key: "messages", label: "Messages", unit: "count" },
   { key: "calls", label: "Calls", unit: "count" }, { key: "leads", label: "Leads", unit: "count" },
@@ -62,7 +63,7 @@ export const GOOGLE_CAMPAIGN_METRICS: MetricDef[] = [
   { key: "formConv", label: "Form conv.", unit: "count" }, { key: "bookingConv", label: "Booking conv.", unit: "count" },
   { key: "otherConv", label: "Other conv.", unit: "count" }];
 
-export interface CampaignRow { id: string; name: string; sub: string; kind: string; notes: string; values: Record<string, MetricValue> }
+export interface CampaignRow { id: string; name: string; sub: string; kind: string; notes: string; resultType?: string; values: Record<string, MetricValue> }
 export interface ReportData { sections: Record<string, { values: Record<string, MetricValue>; notes: string }>; metaCampaigns: CampaignRow[]; googleCampaigns: CampaignRow[] }
 
 export function emptyReportData(): ReportData {
@@ -89,6 +90,11 @@ export const isNum = (v: MetricValue | undefined): v is number => typeof v === "
 export function sumRows(rows: CampaignRow[], key: string): number | null {
   const nums = rows.map(r => r.values[key]).filter(isNum);
   return nums.length ? Math.round(nums.reduce((a, b) => a + b, 0) * 100) / 100 : null;
+}
+
+/** Metric keys that have a real number in at least one campaign row (empty columns are hidden in reports). */
+export function filledColumns(rows: CampaignRow[], metrics: MetricDef[]): MetricDef[] {
+  return metrics.filter(m => rows.some(r => isNum(r.values[m.key])));
 }
 
 export function ratio(a: MetricValue | undefined, b: MetricValue | undefined): number | null {

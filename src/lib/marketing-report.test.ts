@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { sumRows, googleDerived, breakdownIssue, quoteConversionRate, formatMetric, momChange, normalizeReportData, type CampaignRow } from "./marketing-report";
+import { sumRows, googleDerived, breakdownIssue, quoteConversionRate, formatMetric, momChange, normalizeReportData, filledColumns, META_CAMPAIGN_METRICS, type CampaignRow } from "./marketing-report";
 
 const row = (values: CampaignRow["values"]): CampaignRow => ({ id: "x", name: "c", sub: "", kind: "", notes: "", values });
 
@@ -31,6 +31,13 @@ describe("marketing report", () => {
     expect(momChange(150, 100)).toBe(50);
     expect(momChange(5, 0)).toBeNull();
     expect(momChange(5, null)).toBeNull();
+  });
+  it("hides campaign columns with no entered numbers", () => {
+    const keys = filledColumns([row({ spend: 10, clicks: "na" }), row({ costPerResult: 0.8 })], META_CAMPAIGN_METRICS).map(m => m.key);
+    expect(keys).toEqual(["spend", "costPerResult"]);
+  });
+  it("Meta campaigns include Cost per result", () => {
+    expect(META_CAMPAIGN_METRICS.some(m => m.key === "costPerResult" && m.unit === "money")).toBe(true);
   });
   it("normalizes unknown data safely", () => {
     expect(normalizeReportData(null).metaCampaigns).toEqual([]);
