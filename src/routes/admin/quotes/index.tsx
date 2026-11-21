@@ -214,7 +214,7 @@ function AdminQuotes() {
           ) : (
             <ul className="divide-y divide-border">
               {quotes.data?.rows.map((q) => (
-                <li key={q.id} className={`flex flex-wrap items-center pl-4 transition-colors ${q.conversion_status === "converted" ? "bg-[linear-gradient(90deg,color-mix(in_oklch,var(--color-success)_22%,transparent),transparent_45%)]" : "bg-[radial-gradient(circle_at_0%_0%,color-mix(in_oklch,var(--destructive)_22%,transparent),transparent_40%)]"}`}>
+                <li key={q.id} className={`flex flex-wrap items-center pl-4 transition-colors ${q.conversion_status === "converted" ? "bg-[linear-gradient(270deg,color-mix(in_oklch,var(--color-success)_20%,transparent),transparent_15%)]" : "bg-[linear-gradient(270deg,color-mix(in_oklch,var(--destructive)_18%,transparent),transparent_15%)]"}`}>
                   <Checkbox aria-label={`Select ${q.public_reference}`} disabled={allMatching} checked={allMatching || selected.includes(q.id)} onCheckedChange={(checked) => setSelected((s) => checked ? [...new Set([...s, q.id])] : s.filter((id) => id !== q.id))} />
                   <Link
                     to="/admin/quotes/$id"
