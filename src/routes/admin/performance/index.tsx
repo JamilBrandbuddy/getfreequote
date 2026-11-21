@@ -72,11 +72,15 @@ function Performance() {
     <p className="text-sm text-muted-foreground">Monthly marketing results prepared by BrandBuddy for Riverbend Autoglass.</p>
     {session.isPending ? <p className="mt-6">Loading…</p> : !canView ? <p role="alert" className="mt-6 text-destructive">You do not have access to performance reports.</p> : <>
       <div className="mt-6 flex flex-wrap items-end gap-3 rounded-xl border border-border bg-card p-4">
-        <div><p className="mb-1 text-xs text-muted-foreground">Month</p><Select value={String(month)} onValueChange={v => setMonth(Number(v))}><SelectTrigger className="w-40" aria-label="Month"><SelectValue /></SelectTrigger><SelectContent>{MONTHS.map((m, i) => <SelectItem key={m} value={String(i + 1)}>{m}</SelectItem>)}</SelectContent></Select></div>
         <div><p className="mb-1 text-xs text-muted-foreground">Year</p><Select value={String(year)} onValueChange={v => setYear(Number(v))}><SelectTrigger className="w-28" aria-label="Year"><SelectValue /></SelectTrigger><SelectContent>{YEARS.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}</SelectContent></Select></div>
         {isMarketing && (draftForMonth
           ? <Button asChild className="ml-auto"><Link to="/admin/performance/$reportId" params={{ reportId: draftForMonth.id }}>Edit {periodLabel(year, month)} report</Link></Button>
           : <Button className="ml-auto" onClick={() => create.mutate()} disabled={create.isPending}><Plus /> Create {periodLabel(year, month)} report</Button>)}
+      </div>
+      <div className="mt-3 grid grid-cols-3 gap-2 rounded-xl border border-border bg-card p-3 sm:grid-cols-6 lg:grid-cols-12" role="group" aria-label="Month">
+        {MONTHS.map((m, i) => { const mm = i + 1; const active = mm === month; const has = !!find(year, mm); const draft = !has && !!drafts.data?.find(r => r.period_year === year && r.period_month === mm);
+          return <Button key={m} variant={active ? "default" : "outline"} aria-pressed={active} onClick={() => setMonth(mm)} className="relative h-10">{m.slice(0, 3)}
+            {(has || draft) && <span aria-hidden className={`absolute bottom-1 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full ${has ? "bg-primary" : "bg-muted-foreground"} ${active ? "bg-primary-foreground" : ""}`} />}</Button>; })}
       </div>
       {create.error && <p role="alert" className="mt-2 text-destructive">{create.error.message}</p>}
 
