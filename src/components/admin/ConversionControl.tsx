@@ -1,22 +1,23 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { CheckCircle2, RotateCcw, XCircle } from "lucide-react";
+import { CheckCircle2, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { setQuoteConversion } from "@/lib/admin.functions";
-import { conversionLabel, suggestedConversion, type ConversionStatus } from "@/lib/conversion";
+import { conversionLabel, type ConversionStatus } from "@/lib/conversion";
 
 const badge: Record<string, string> = {
-  converted: "bg-primary/10 text-primary",
-  not_converted: "bg-destructive/10 text-destructive",
-  pending: "bg-muted text-muted-foreground",
+  converted: "bg-success/20 text-success ring-1 ring-success/40",
+  not_converted: "bg-destructive/15 text-destructive",
+  pending: "bg-destructive/15 text-destructive",
 };
 export function ConversionBadge({ value, status }: { value?: string | null; status?: string }) {
-  const hint = status ? suggestedConversion(status, value ?? "pending") : null;
-  return <span className={`rounded-full px-3 py-1 text-xs font-semibold ${badge[value ?? "pending"] ?? badge.pending}`} title={hint ? `Suggested by quote status: ${conversionLabel(hint)} (not confirmed)` : "Conversion outcome"}>
-    {conversionLabel(value)}{hint ? ` · likely ${conversionLabel(hint).toLowerCase()}?` : ""}
+  void status;
+  const done = value === "converted";
+  return <span className={`whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold ${badge[value ?? "pending"] ?? badge.pending}`} title="Conversion outcome">
+    {done ? "✔ Converted" : "Not converted"}
   </span>;
 }
 
@@ -33,12 +34,12 @@ export function ConversionControl({ quoteId, reference, value, compact }: { quot
   });
   const actions: { s: ConversionStatus; label: string; icon: React.ReactNode }[] = [
     { s: "converted", label: "Mark as Converted", icon: <CheckCircle2 className="size-4" aria-hidden /> },
-    { s: "not_converted", label: "Mark as Not Converted", icon: <XCircle className="size-4" aria-hidden /> },
-    { s: "pending", label: "Reset to Pending", icon: <RotateCcw className="size-4" aria-hidden /> },
+    { s: "not_converted", label: "Undo — Not Converted", icon: <RotateCcw className="size-4" aria-hidden /> },
   ];
+  const visible = actions.filter((a) => (value === "converted" ? a.s === "not_converted" : a.s === "converted"));
   return <>
     <div className="flex flex-wrap gap-2">
-      {actions.filter((a) => a.s !== value).map((a) => <Button key={a.s} type="button" size={compact ? "sm" : "default"} variant="outline" className="rounded-xl" aria-label={`${a.label}: ${reference}`} title={a.label} onClick={() => { setError(""); setTarget(a.s); }}>
+      {visible.map((a) => <Button key={a.s} type="button" size={compact ? "sm" : "default"} variant="outline" className={`rounded-xl ${a.s === "converted" ? "border-success/50 text-success hover:bg-success/15 hover:text-success" : "text-muted-foreground"}`} aria-label={`${a.label}: ${reference}`} title={a.label} onClick={() => { setError(""); setTarget(a.s); }}>
         {a.icon}{compact ? <span className="sr-only sm:not-sr-only">{a.label.replace("Mark as ", "")}</span> : a.label}
       </Button>)}
     </div>

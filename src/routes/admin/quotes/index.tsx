@@ -214,7 +214,7 @@ function AdminQuotes() {
           ) : (
             <ul className="divide-y divide-border">
               {quotes.data?.rows.map((q) => (
-                <li key={q.id} className="flex flex-wrap items-center pl-4">
+                <li key={q.id} className={`flex flex-wrap items-center pl-4 transition-colors ${q.conversion_status === "converted" ? "bg-[linear-gradient(90deg,color-mix(in_oklch,var(--color-success)_22%,transparent),transparent_45%)]" : "bg-[radial-gradient(circle_at_0%_0%,color-mix(in_oklch,var(--destructive)_22%,transparent),transparent_40%)]"}`}>
                   <Checkbox aria-label={`Select ${q.public_reference}`} disabled={allMatching} checked={allMatching || selected.includes(q.id)} onCheckedChange={(checked) => setSelected((s) => checked ? [...new Set([...s, q.id])] : s.filter((id) => id !== q.id))} />
                   <Link
                     to="/admin/quotes/$id"
@@ -245,7 +245,7 @@ function AdminQuotes() {
                       {new Date(q.created_at).toLocaleDateString("en-CA", { timeZone: "America/Regina" })}
                     </span>
                   </Link>
-                  <div className="pr-4 lg:flex lg:w-[18.5rem] lg:shrink-0 lg:justify-end"><ConversionControl compact quoteId={q.id} reference={q.public_reference} value={q.conversion_status ?? "pending"} /></div>
+                  <div className="pr-4 lg:flex lg:w-[13rem] lg:shrink-0 lg:justify-end"><ConversionControl compact quoteId={q.id} reference={q.public_reference} value={q.conversion_status ?? "pending"} /></div>
                 </li>
               ))}
             </ul>

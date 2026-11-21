@@ -19,6 +19,7 @@
  */
 
 @theme inline {
+  --color-success: oklch(0.72 0.17 150);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
