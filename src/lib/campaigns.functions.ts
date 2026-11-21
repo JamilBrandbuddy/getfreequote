@@ -39,15 +39,15 @@ export const saveEmailSettings = createServerFn({ method: "POST" }).middleware([
 // ---------- signatures ----------
 const sigSchema = z.object({ id: z.string().uuid().optional(), name: z.string().trim().min(1).max(80), sender_name: z.string().max(100).optional(), job_title: z.string().max(100).optional(), company_name: z.string().max(120).optional(),
   phone: z.string().max(40).optional(), email: z.string().max(200).optional(), website: httpsOrEmpty.optional(), address: z.string().max(300).optional(), facebook_url: httpsOrEmpty.optional(), instagram_url: httpsOrEmpty.optional(),
-  custom_html: z.string().max(4000).optional(), show_logo: z.boolean(), brand_color: z.string().regex(/^#[0-9a-f]{6}$/i), is_default: z.boolean() });
+  custom_html: z.string().max(25000).optional(), show_logo: z.boolean(), brand_color: z.string().regex(/^#[0-9a-f]{6}$/i), is_default: z.boolean() });
 export const saveSignature = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator(sigSchema).handler(async ({ data, context }) => {
   const ctx = context as Ctx; await requireOperator(ctx);
-  const { sanitizeEmailHtml } = await import("./email-sanitize");
-  const row = { ...data, custom_html: data.custom_html ? sanitizeEmailHtml(data.custom_html) : null };
+  const { sanitizeSignatureHtml } = await import("./email-sanitize");
+  const row = { ...data, custom_html: data.custom_html ? sanitizeSignatureHtml(data.custom_html) : null };
   if (data.is_default) await ctx.supabase.from("email_signatures").update({ is_default: false }).eq("is_default", true);
   const { id, ...rest } = row;
   const q = id ? ctx.supabase.from("email_signatures").update(rest).eq("id", id) : ctx.supabase.from("email_signatures").insert({ ...rest, created_by: ctx.userId });
-  const { error } = await q; if (error) throw new Error("Could not save signature.");
+  const { error } = await q; if (error) throw new Error("Could not save signature: " + error.message);
   return { ok: true };
 });
 export const deleteSignature = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator(z.object({ id: z.string().uuid() })).handler(async ({ data, context }) => {

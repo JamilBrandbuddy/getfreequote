@@ -12,3 +12,20 @@ export function sanitizeEmailHtml(html: string) {
     transformTags: { a: sanitizeHtml.simpleTransform("a", { target: "_blank" }) },
   });
 }
+
+/** Signature HTML: allows email table layouts and inline styles (no scripts, https images, https/mailto/tel links only). */
+export function sanitizeSignatureHtml(html: string) {
+  return sanitizeHtml(html, {
+    allowedTags: ["table", "tbody", "thead", "tr", "td", "th", "h1", "h2", "h3", "p", "br", "hr", "strong", "b", "em", "i", "u", "a", "img", "div", "span"],
+    allowedAttributes: {
+      a: ["href", "style", "target"], img: ["src", "alt", "width", "height", "border", "style"],
+      table: ["role", "border", "cellpadding", "cellspacing", "width", "style", "align"],
+      td: ["width", "height", "valign", "align", "colspan", "rowspan", "bgcolor", "style"], th: ["width", "height", "valign", "align", "colspan", "style"],
+      "*": ["style", "align"],
+    },
+    allowedSchemes: ["https", "mailto", "tel"],
+    allowedSchemesByTag: { img: ["https"] },
+    allowProtocolRelative: false,
+    transformTags: { a: sanitizeHtml.simpleTransform("a", { target: "_blank" }) },
+  });
+}

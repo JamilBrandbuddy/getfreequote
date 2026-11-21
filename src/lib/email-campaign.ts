@@ -68,7 +68,10 @@ export interface SignatureData { sender_name?: string | null; job_title?: string
 const safeUrl = (u?: string | null) => (u && /^https:\/\/[^\s"<>]+$/i.test(u) ? u : null);
 const safeColor = (c?: string) => (c && /^#[0-9a-f]{6}$/i.test(c) ? c : "#0b2545");
 
+/** A full designed signature (pasted HTML containing a table) replaces the generated name/contact block entirely. */
+export const isFullHtmlSignature = (s: SignatureData) => !!s.custom_html && /<table[\s>]/i.test(s.custom_html);
 export function renderSignature(s: SignatureData) {
+  if (isFullHtmlSignature(s)) return `<div style="margin-top:24px">${s.custom_html}</div>`;
   const color = safeColor(s.brand_color); const e = (v?: string | null) => (v ? escapeHtml(v) : "");
   const lines: string[] = [];
   if (s.sender_name) lines.push(`<strong style="color:${color};font-size:15px">${e(s.sender_name)}</strong>`);
