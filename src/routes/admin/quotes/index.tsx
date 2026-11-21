@@ -246,7 +246,7 @@ function AdminQuotes() {
                       {new Date(q.created_at).toLocaleDateString("en-CA", { timeZone: "America/Regina" })}
                     </span>
                   </Link>
-                  <div className="pr-4 lg:shrink-0"><ConversionControl compact quoteId={q.id} reference={q.public_reference} value={q.conversion_status ?? "pending"} /></div>
+                  <div className="pr-4 lg:flex lg:w-[18.5rem] lg:shrink-0 lg:justify-end"><ConversionControl compact quoteId={q.id} reference={q.public_reference} value={q.conversion_status ?? "pending"} /></div>
                 </li>
               ))}
             </ul>
